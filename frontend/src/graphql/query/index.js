@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 
 export const GET_CATEGORIES = gql`
-  query GetCategories{
+  query GetCategories {
     categories {
       name
     }
@@ -34,7 +34,7 @@ export const GET_PRODUCTS = gql`
           displayValue
           value
         }
-          type
+        type
       }
 
       brand
@@ -74,4 +74,10 @@ export const GET_PRODUCT_BY_ID = gql`
       brand
     }
   }
+`;
+
+export const CREATE_NEW_ORDER = gql`
+  mutation createOrder($order: Order) {
+    createOrder(order: $order)
+    }
 `;
