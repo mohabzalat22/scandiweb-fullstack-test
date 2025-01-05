@@ -11,6 +11,7 @@ class App
     protected static $instance = null;
     protected $config = [];
     protected $services = [];
+    public $bootstraped = false;
 
     public static function init()
     {
@@ -21,8 +22,27 @@ class App
         return self::$instance;
     }
 
-    public function registerConfig(array $config)
+    public function registerDefaultServices()
     {
+        $services = require BASE_PATH . '/src/Core/ServiceProvider.php';
+        foreach($services as $name=>$value){
+            $this->services[$name] = $value;
+        }
+    }
+
+    public function bootstrap()
+    {
+        if($this->bootstraped === false){ //first time
+
+            $this->registerConfig();
+            $this->registerDefaultServices();
+            $this->bootstraped = true;
+        }
+    }
+
+    public function registerConfig()
+    {
+        $config = require BASE_PATH . '/config/app.php';
         $this->config = $config;
     }
 
@@ -59,7 +79,7 @@ class App
         
             case Dispatcher::METHOD_NOT_ALLOWED:
                 $allowedMethods = $routeInfo[1];
-                echo "405 Not Allowed";
+                echo "405 Not Allowed only allow $allowedMethods .";
                 break;
         
             case Dispatcher::FOUND:
