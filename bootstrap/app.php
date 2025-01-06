@@ -10,7 +10,6 @@ require_once BASE_PATH . '/src/core/Database.php';
 use Dotenv\Dotenv;
 use App\App;
 
-
 $dotenv = Dotenv::createImmutable(__DIR__.'/..'); 
 $dotenv->load();
 
@@ -19,10 +18,5 @@ $app = App::init();
 $app->bootstrap();
 
 // database start
-
-$database = $app->getService('database');
-$orm = $database->orm();
-
-//crud test
 
 return $app;
