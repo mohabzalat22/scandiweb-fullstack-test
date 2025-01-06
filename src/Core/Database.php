@@ -1,44 +1,29 @@
 <?php
 namespace App;
 
-use RedBeanPHP\R;
+use Medoo\Medoo;
 
 class Database
 {
     private static $instance = null;
+    private $database = null;
 
     private function __construct()
     {
-        $this->init();
-    }
+        $databaseConfig = require BASE_PATH . '/config/database.php';
+    
+        $config = [
+            'type'   => $databaseConfig['db_driver'],
+            'host'     => $databaseConfig['db_host'],
+            'database'   => $databaseConfig['db_name'],
+            'username'     => $databaseConfig['db_user'],
+            'password' => $databaseConfig['db_password'],
+            'port'     => $databaseConfig['db_port'],
+        ];
 
-    public static function init()
-    {
-        if (!R::testConnection()) {
-            $databaseConfig = require BASE_PATH . '/config/database.php';
-    
-            $config = [
-                'driver'   => $databaseConfig['db_driver'],
-                'user'     => $databaseConfig['db_user'],
-                'password' => $databaseConfig['db_password'],
-                'dbname'   => $databaseConfig['db_name'],
-                'host'     => $databaseConfig['db_host'],
-                'port'     => $databaseConfig['db_port'],
-            ];
-    
-            //connect starting point
-    
-            R::setup(
-                $config['driver'] .
-                ":host=" . $config['host'] .
-                ";port=" . $config['port'] .
-                ";dbname=" . $config['dbname'], $config['user'], $config['password']
-            );
-    
-            if (!R::testConnection()) {
-                throw new \Exception("Failed to connect to the database.");
-            }
-        }
+        //connect starting point
+        $database = new Medoo($config);
+        $this->database = $database;
     }
 
     public static function getInstance()
@@ -52,7 +37,7 @@ class Database
 
     public function orm()
     {
-        return R::class;
+        return $this->database;
     }
 
 }
