@@ -6,7 +6,7 @@ use App\Models\Model;
 
 class Category extends Model {
 
-    protected string $table = 'categories';
+    protected string $table = 'currencies';
 
     public function __construct(){
         parent::__construct($this->table);

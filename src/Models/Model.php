@@ -1,52 +1,46 @@
 <?php
 
-namespace App\Model;
+namespace App\Models;
 
 abstract class Model
 {
-    public function __construct(protected $table, private $orm)
+    private $orm;
+    public function __construct(protected string $table)
     {
         $this->table = $table;
+        $database = \App\App::init()->getService('database');
+        $this->orm = $database->orm();
     }
 
     public function create(array $data)
     {
-        $record = $this->orm::dispense($this->table);
-        foreach ($data as $key => $value) {
-            $record->$key = $value;
-        }
-        return $this->orm::store($record);
+        $result = $this->orm->insert($this->table, $data);
+        return $result->rowCount() ?  $this->find($data['id']) : NULL;
     }
 
     public function find($id)
     {
-        return $this->orm::load($this->table, $id);
+        return $this->orm->get($this->table,"*", ['id'=> $id]);
     }
 
     public function all()
     {
-        return $this->orm::findAll($this->table);
+        return $this->orm->select($this->table, "*");
     }
 
     public function update($id, array $data)
     {
-        $record = $this->orm::load($this->table, $id);
-        if ($record->id) {
-            foreach ($data as $key => $value) {
-                $record->$key = $value;
-            }
-            return $this->orm::store($record);
+        if(isset($data['id'])){
+            unset($data['id']); // unset id 
         }
-        return false;
+
+        $result = $this->orm->update($this->table, $data, ['id'=> $id]);
+        return $result->rowCount() ?  $this->find($id) : NULL; 
     }
 
     public function delete($id)
     {
-        $record = $this->orm::load($this->table, $id);
-        if ($record->id) {
-            $this->orm::trash($record);
-            return true;
-        }
-        return false;
+        $result = $this->orm->delete($this->table, ['id'=> $id]);
+        return $result->rowCount() ?  TRUE : FALSE; 
     }
 }
