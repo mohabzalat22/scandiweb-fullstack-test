@@ -64,7 +64,7 @@ class App
     public function run()
     {
         $dispatcher = \FastRoute\simpleDispatcher(function(RouteCollector $r) {
-            $r->get('/graphql', [GraphQl::class, 'handle']);
+            $r->post('/graphql', [GraphQl::class, 'handle']);
         });
         
         $routeInfo = $dispatcher->dispatch(
@@ -79,7 +79,7 @@ class App
         
             case Dispatcher::METHOD_NOT_ALLOWED:
                 $allowedMethods = $routeInfo[1];
-                echo "405 Not Allowed only allow $allowedMethods .";
+                echo "405 Not Allowed only allow : " . implode(', ', $allowedMethods);
                 break;
         
             case Dispatcher::FOUND:
