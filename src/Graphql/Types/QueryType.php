@@ -7,6 +7,7 @@ use GraphQL\Type\Definition\ListOfType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use App\Graphql\Types\ProductType;
+use App\Models\Category;
 use App\Models\Product;
 use Exception;
 use Throwable;
@@ -25,6 +26,12 @@ final class QueryType extends ObjectType {
                         'message' => ['type' => Type::string()],
                     ],
                     'resolve' => static fn ($rootValue, array $args): string => $rootValue['prefix'] . $args['message'],
+                ],
+                'categories' => [
+                    'type' => Type::listOf(new CategoryType()),
+                    'resolve' => function(){
+                        return (new Category())->all();
+                    }
                 ],
                 'products' => [
                     'type' => Type::listOf($productType),
