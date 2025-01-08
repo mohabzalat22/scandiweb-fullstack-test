@@ -10,6 +10,7 @@ use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Schema;
 use RuntimeException;
 use Throwable;
+use GraphQL\Type\SchemaConfig;
 
 class GraphQL extends Controller
 {
@@ -31,16 +32,14 @@ class GraphQL extends Controller
                 ],
             ]);
         
-            // See docs on schema options:
-            // https://webonyx.github.io/graphql-php/schema-definition/#configuration-options
             $schema = new Schema(
-                ['query' => $queryType,]
+                (new SchemaConfig())
+                    ->setQuery($queryType)
+                    ->setMutation($mutationType)
             );
         
             $rawInput = file_get_contents('php://input');
-            // $rawInput = json_encode([
-            //     "query" => "{ products { id name } }",
-            // ]);
+
             if ($rawInput === false) {
                 throw new RuntimeException('Failed to get php://input');
             }
