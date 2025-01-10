@@ -3,6 +3,8 @@
 namespace App\Graphql\Resolvers;
 
 use App\App;
+use App\Models\Product;
+use Exception;
 
 class ProductResolver 
 {
@@ -126,5 +128,18 @@ class ProductResolver
             }
             return $product;
         }, $products);
+    }
+
+    public static function find(string $id){
+        try{
+            $product = (new Product)->find($id);
+            if(!$product || empty($product)){
+                throw new Exception('unable to find product with id :'.$id);
+            }
+            return $product;
+
+        } catch (Exception $e){
+            \App\App::init()->getService('logger')->error($e->getMessage());
+        }
     }
 }
