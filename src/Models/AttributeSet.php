@@ -4,7 +4,7 @@ namespace App\Models;
 
 use App\Models\Model;
 
-class Category extends Model {
+class AttributeSet extends Model {
 
     protected string $table = 'products_attributes';
 
