@@ -74,9 +74,7 @@ class ProductResolver
                 p.id, c.name; 
             ";
         $category = trim($category);
-        echo $category;
         if(!empty($category) && $category != 'all' ){
-            echo "not all";
             $selectedCategoryRecord = $database->get('categories', '*', [
                 'name' => htmlspecialchars($category)
             ]);
