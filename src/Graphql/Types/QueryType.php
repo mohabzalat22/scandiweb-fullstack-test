@@ -7,7 +7,6 @@ use GraphQL\Type\Definition\Type;
 use Exception;
 use App\Graphql\Resolvers\ProductResolver;
 use App\Models\Category;
-use App\Models\Product;
 
 final class QueryType extends ObjectType {
 
@@ -49,15 +48,8 @@ final class QueryType extends ObjectType {
                         ]
                     ],
                     'resolve' => function($root, $args){
-                        try{
-                            $product = (new Product)->find($args['id']);
-                            if(!$product || empty($product)){
-                                throw new Exception('unable to find product with id :'.$args['id']);
-                            }
-                            return $product;
-                        } catch (Exception $e){
-                            \App\App::init()->getService('logger')->error($e->getMessage());
-                        }
+                        $product = ProductResolver::find($args['id']);
+                        return $product;
                     }
                 ]
             ],
