@@ -3,6 +3,7 @@
 namespace App\Graphql\Resolvers;
 
 use App\App;
+use App\Models\Attribute;
 use App\Models\Product;
 use Exception;
 
@@ -12,7 +13,37 @@ class ProductResolver
     {
         $database = App::init()->getService('database')->orm();
 
-        $sql = "SELECT 
+        $sql = "WITH attribute_items AS (
+                SELECT 
+                    pa.attribute_id,
+                    pa.product_id,
+                    JSON_ARRAYAGG(
+                        JSON_OBJECT(
+                            'id', pa.id,
+                            'value', pa.value,
+                            'displayValue', pa.displayValue
+                        )
+                    ) AS items
+                FROM product_attributes pa
+                GROUP BY pa.attribute_id, pa.product_id
+            ),
+            product_prices AS (
+                SELECT 
+                    pr.product_id,
+                    JSON_ARRAYAGG(
+                        JSON_OBJECT(
+                            'currency', JSON_OBJECT(
+                                'label', cur.label, 
+                                'symbol', cur.symbol
+                            ),
+                            'amount', pr.amount
+                        )
+                    ) AS prices
+                FROM prices pr
+                LEFT JOIN currencies cur ON pr.currency_id = cur.id
+                GROUP BY pr.product_id
+            )
+            SELECT 
                 p.id,
                 p.name,
                 p.inStock,
@@ -25,93 +56,96 @@ class ProductResolver
                         'id', a.id,
                         'name', a.name,
                         'type', a.type,
-                        'items', (
-                            SELECT JSON_ARRAYAGG(
-                                JSON_OBJECT(
-                                    'id', pa.id,
-                                    'value', pa.value,
-                                    'displayValue', pa.displayValue
-                                )
-                            )
-                            FROM product_attributes pa
-                            WHERE pa.attribute_id = a.id AND pa.product_id = p.id
-                        )
+                        'items', ai.items
                     )
                 ) AS attributes,
-                JSON_ARRAYAGG(
-                    JSON_OBJECT(
-                        'currency', JSON_OBJECT(
-                            'label', cur.label, 
-                            'symbol', cur.symbol 
-                        ),
-                        'amount', pr.amount
-                    )
-                ) AS prices
+                pp.prices
             FROM 
                 products p
-            LEFT JOIN categories c ON p.category_id = c.id
-            LEFT JOIN prices pr ON pr.product_id = p.id
-            LEFT JOIN currencies cur ON pr.currency_id = cur.id
-            LEFT JOIN product_attributes pa ON pa.product_id = p.id
-            LEFT JOIN attributes a ON pa.attribute_id = a.id
+            LEFT JOIN categories c ON p.category_id = c.id 
+            LEFT JOIN product_prices pp ON pp.product_id = p.id
+            LEFT JOIN attributes a ON a.id IN (
+                SELECT DISTINCT pa.attribute_id 
+                FROM product_attributes pa 
+                WHERE pa.product_id = p.id
+            )
+            LEFT JOIN attribute_items ai ON ai.attribute_id = a.id AND ai.product_id = p.id
             GROUP BY 
-                p.id;
-        ";
+                p.id, c.name; 
+            ";
         $category = trim($category);
+        echo $category;
         if(!empty($category) && $category != 'all' ){
+            echo "not all";
             $selectedCategoryRecord = $database->get('categories', '*', [
                 'name' => htmlspecialchars($category)
             ]);
 
             if($selectedCategoryRecord){
-                $sql = "SELECT 
+                $sql = "WITH attribute_items AS (
+                        SELECT 
+                            pa.attribute_id,
+                            pa.product_id,
+                            JSON_ARRAYAGG(
+                                JSON_OBJECT(
+                                    'id', pa.id,
+                                    'value', pa.value,
+                                    'displayValue', pa.displayValue
+                                )
+                            ) AS items
+                        FROM product_attributes pa
+                        GROUP BY pa.attribute_id, pa.product_id
+                    ),
+                    product_prices AS (
+                        SELECT 
+                            pr.product_id,
+                            JSON_ARRAYAGG(
+                                JSON_OBJECT(
+                                    'currency', JSON_OBJECT(
+                                        'label', cur.label, 
+                                        'symbol', cur.symbol
+                                    ),
+                                    'amount', pr.amount
+                                )
+                            ) AS prices
+                        FROM prices pr
+                        LEFT JOIN currencies cur ON pr.currency_id = cur.id
+                        GROUP BY pr.product_id
+                    )
+                    SELECT 
                         p.id,
                         p.name,
                         p.inStock,
                         p.gallery,
                         p.description,
                         p.brand,
-                        c.name AS category,
+                        c.name AS category, 
                         JSON_ARRAYAGG(
                             JSON_OBJECT(
                                 'id', a.id,
                                 'name', a.name,
                                 'type', a.type,
-                                'items', (
-                                    SELECT JSON_ARRAYAGG(
-                                        JSON_OBJECT(
-                                            'id', pa.id,
-                                            'value', pa.value,
-                                            'displayValue', pa.displayValue
-                                        )
-                                    )
-                                    FROM product_attributes pa
-                                    WHERE pa.attribute_id = a.id AND pa.product_id = p.id
-                                )
+                                'items', ai.items
                             )
                         ) AS attributes,
-                        JSON_ARRAYAGG(
-                            JSON_OBJECT(
-                                'currency', JSON_OBJECT(
-                                    'label', cur.label, 
-                                    'symbol', cur.symbol 
-                                ),
-                                'amount', pr.amount
-                            )
-                        ) AS prices
+                        pp.prices
                     FROM 
                         products p
-                    LEFT JOIN categories c ON p.category_id = c.id
-                    LEFT JOIN prices pr ON pr.product_id = p.id
-                    LEFT JOIN currencies cur ON pr.currency_id = cur.id
-                    LEFT JOIN product_attributes pa ON pa.product_id = p.id
-                    LEFT JOIN attributes a ON pa.attribute_id = a.id
-                    WHERE p.category_id = :category_id
+                    LEFT JOIN categories c ON p.category_id = c.id 
+                    LEFT JOIN product_prices pp ON pp.product_id = p.id
+                    LEFT JOIN attributes a ON a.id IN (
+                        SELECT DISTINCT pa.attribute_id 
+                        FROM product_attributes pa 
+                        WHERE pa.product_id = p.id
+                    )
+                    LEFT JOIN attribute_items ai ON ai.attribute_id = a.id AND ai.product_id = p.id
+                    WHERE c.name = :category
                     GROUP BY 
-                        p.id;
+                        p.id, c.name; 
+
                 ";
                 $stmt = $database->pdo->prepare($sql);
-                $stmt->execute(['category_id' => $selectedCategoryRecord['id']]);
+                $stmt->execute(['category' => $selectedCategoryRecord['name']]);
                 $products = $stmt->fetchAll(\PDO::FETCH_ASSOC);
             }
         } else {
@@ -131,13 +165,85 @@ class ProductResolver
     }
 
     public static function find(string $id){
+        $database = App::init()->getService('database')->orm();
         try{
-            $product = (new Product)->find($id);
-            if(!$product || empty($product)){
-                throw new Exception('unable to find product with id :'.$id);
-            }
-            return $product;
+            $sql = "WITH attribute_items AS (
+                SELECT 
+                    pa.attribute_id,
+                    pa.product_id,
+                    JSON_ARRAYAGG(
+                        JSON_OBJECT(
+                            'id', pa.id,
+                            'value', pa.value,
+                            'displayValue', pa.displayValue
+                        )
+                    ) AS items
+                FROM product_attributes pa
+                GROUP BY pa.attribute_id, pa.product_id
+            ),
+            product_prices AS (
+                SELECT 
+                    pr.product_id,
+                    JSON_ARRAYAGG(
+                        JSON_OBJECT(
+                            'currency', JSON_OBJECT(
+                                'label', cur.label, 
+                                'symbol', cur.symbol
+                            ),
+                            'amount', pr.amount
+                        )
+                    ) AS prices
+                FROM prices pr
+                LEFT JOIN currencies cur ON pr.currency_id = cur.id
+                GROUP BY pr.product_id
+            )
+            SELECT 
+                p.id,
+                p.name,
+                p.inStock,
+                p.gallery,
+                p.description,
+                p.brand,
+                c.name AS category, 
+                JSON_ARRAYAGG(
+                    JSON_OBJECT(
+                        'id', a.id,
+                        'name', a.name,
+                        'type', a.type,
+                        'items', ai.items
+                    )
+                ) AS attributes,
+                pp.prices
+            FROM 
+                products p
+            LEFT JOIN categories c ON p.category_id = c.id 
+            LEFT JOIN product_prices pp ON pp.product_id = p.id
+            LEFT JOIN attributes a ON a.id IN (
+                SELECT DISTINCT pa.attribute_id 
+                FROM product_attributes pa 
+                WHERE pa.product_id = p.id
+            )
+            LEFT JOIN attribute_items ai ON ai.attribute_id = a.id AND ai.product_id = p.id
+            WHERE 
+                p.id = :product_id
+            GROUP BY 
+                p.id, c.name;
+            ";
+            $id = trim($id);
+            if($id && !empty($id)){
+                $stmt = $database->pdo->prepare($sql);
+                $stmt->execute(['product_id' => $id]);
+                $product = $stmt->fetch(\PDO::FETCH_ASSOC);
+                // assoc array
 
+                if (isset($product['attributes'])) {
+                    $product['attributes'] = json_decode($product['attributes'], true);
+                }
+                if (isset($product['prices'])) {
+                    $product['prices'] = json_decode($product['prices'], true);
+                }
+                return $product;
+            }
         } catch (Exception $e){
             \App\App::init()->getService('logger')->error($e->getMessage());
         }
