@@ -20,7 +20,7 @@ final class ProductType extends ObjectType {
                 'category' => Type::string(),
                 'attributes' => Type::listOf(new AttributeType),
                 'brand' => Type::nonNull(Type::string()),
-                //prices
+                'prices' => Type::listOf(new PriceType)
             ],
         ]);
     }
