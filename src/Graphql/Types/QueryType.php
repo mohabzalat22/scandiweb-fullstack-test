@@ -32,12 +32,17 @@ final class QueryType extends ObjectType {
                 ],
                 'products' => [
                     'type' => Type::listOf($productType),
+                    'args' => [
+                        'category' =>[
+                            'type' => Type::string()
+                            ]
+                        ],
                     'resolve' => function($root, $args){
-                        return ProductResolver::all();
+                        return ProductResolver::all($args['category']);
                     },  
                 ],
                 'product' => [
-                    'type' => Type::getNullableType($productType),
+                    'type' => $productType,
                     'args' => [
                         'id' => [
                             'type' => Type::nonNull(Type::string())
