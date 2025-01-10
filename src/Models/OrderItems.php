@@ -4,7 +4,7 @@ namespace App\Models;
 
 use App\Models\Model;
 
-class Category extends Model {
+class OrderItem extends Model {
 
     protected string $table = 'order_items';
 
