@@ -11,11 +11,14 @@ use GraphQL\Type\Schema;
 use RuntimeException;
 use Throwable;
 use GraphQL\Type\SchemaConfig;
+use App\App;
 
 class GraphQL extends Controller
 {
     public static function handle() {
         try {
+            $logger = App::init()->getService('logger');
+
             $queryType = new QueryType();
         
             $mutationType = new ObjectType([
@@ -63,8 +66,8 @@ class GraphQL extends Controller
 
             $result = GraphQLBase::executeQuery($schema, $query, null, null, $variableValues);
             $output = $result->toArray();
+            $logger->debug(json_encode($output));
         } catch (Throwable $e) {
-            $logger = \App\App::init()->getService('logger');
             $logger->error('An error occurred: ' . $e->getMessage(), [
                 'exception' => $e,
                 'stack_trace' => $e->getTraceAsString(),
