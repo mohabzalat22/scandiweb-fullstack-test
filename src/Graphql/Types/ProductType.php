@@ -2,7 +2,6 @@
 
 namespace App\Graphql\Types;
 
-use GraphQL\GraphQL as GraphQLBase;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 
@@ -15,7 +14,13 @@ final class ProductType extends ObjectType {
             'fields' => [
                 'id' => Type::nonNull(Type::string()),
                 'name' => Type::nonNull(Type::string()),
-                'description' =>Type::string()
+                'inStock' => Type::nonNull(Type::boolean()),
+                'gallery' => Type::nonNull(Type::string()),
+                'description' => Type::string(), //can be null
+                'category' => Type::string(),
+                'attributes' => Type::listOf(new AttributeType),
+                'brand' => Type::nonNull(Type::string()),
+                //prices
             ],
         ]);
     }
