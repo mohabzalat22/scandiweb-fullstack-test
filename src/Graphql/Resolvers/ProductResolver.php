@@ -152,7 +152,11 @@ class ProductResolver
 
         // process the results to associative arr
         return array_map(function ($product) {
-            if (isset($product['attributes'])) {
+            $attributeStatusOk = json_decode($product['attributes'])[0]->id != null;
+            if(!$attributeStatusOk){
+                $product['attributes'] = null;
+            }
+            if (isset($product['attributes']) && $attributeStatusOk) {
                 $product['attributes'] = json_decode($product['attributes'], true);
             }
             if (isset($product['prices'])) {
@@ -216,10 +220,10 @@ class ProductResolver
                 products p
             LEFT JOIN categories c ON p.category_id = c.id 
             LEFT JOIN product_prices pp ON pp.product_id = p.id
-            LEFT JOIN attributes a ON a.id IN (
-                SELECT DISTINCT pa.attribute_id 
-                FROM product_attributes pa 
-                WHERE pa.product_id = p.id
+            LEFT JOIN attributes a ON EXISTS (
+                SELECT 1
+                FROM product_attributes pa
+                WHERE pa.product_id = p.id AND pa.attribute_id = a.id
             )
             LEFT JOIN attribute_items ai ON ai.attribute_id = a.id AND ai.product_id = p.id
             WHERE 
@@ -233,8 +237,11 @@ class ProductResolver
                 $stmt->execute(['product_id' => $id]);
                 $product = $stmt->fetch(\PDO::FETCH_ASSOC);
                 // assoc array
-
-                if (isset($product['attributes'])) {
+                $attributeStatusOk = json_decode($product['attributes'])[0]->id != null;
+                if(!$attributeStatusOk){
+                    $product['attributes'] = null;
+                }
+                if (isset($product['attributes']) && $attributeStatusOk) {
                     $product['attributes'] = json_decode($product['attributes'], true);
                 }
                 if (isset($product['prices'])) {
