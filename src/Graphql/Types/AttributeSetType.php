@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Graphql\Types;
 
 use GraphQL\Type\Definition\ObjectType;
@@ -13,10 +12,9 @@ final class AttributeSetType extends ObjectType {
             'name' => 'AttributeSet',
             'fields' => [
                 'id' => Type::string(),
-                'attribute_id' => Type::string(),
-                'product_id' => Type::string(),
-                'displayValue' => Type::string(),
-                'value' => Type::string(),
+                'name' => Type::string(),
+                'type' => Type::string(),
+                'items' => Type::listOf(new AttributeType)
             ],
         ]);
     }
