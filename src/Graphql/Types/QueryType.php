@@ -2,15 +2,12 @@
 
 namespace App\Graphql\Types;
 
-use GraphQL\GraphQL as GraphQLBase;
-use GraphQL\Type\Definition\ListOfType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
-use App\Graphql\Types\ProductType;
+use Exception;
+use App\Graphql\Resolvers\ProductResolver;
 use App\Models\Category;
 use App\Models\Product;
-use Exception;
-use Throwable;
 
 final class QueryType extends ObjectType {
 
@@ -36,7 +33,7 @@ final class QueryType extends ObjectType {
                 'products' => [
                     'type' => Type::listOf($productType),
                     'resolve' => function($root, $args){
-                        return (new Product)->all();
+                        return ProductResolver::all();
                     },  
                 ],
                 'product' => [
@@ -53,7 +50,7 @@ final class QueryType extends ObjectType {
                                 throw new Exception('unable to find product with id :'.$args['id']);
                             }
                             return $product;
-                        } catch (Throwable $e){
+                        } catch (Exception $e){
                             \App\App::init()->getService('logger')->error($e->getMessage());
                         }
                     }
