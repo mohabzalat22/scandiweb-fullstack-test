@@ -17,6 +17,4 @@ $dotenv->load();
 $app = App::init();
 $app->bootstrap();
 
-// database start
-
 return $app;
