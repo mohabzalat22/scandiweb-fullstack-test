@@ -153,14 +153,17 @@ class ProductResolver
         // process the results to associative arr
         return array_map(function ($product) {
             $attributeStatusOk = json_decode($product['attributes'])[0]->id != null;
+            if(isset($product['gallery'])){
+                $product['gallery'] = json_decode($product['gallery']) ?? [];
+            }
             if(!$attributeStatusOk){
-                $product['attributes'] = null;
+                $product['attributes'] = [];
             }
             if (isset($product['attributes']) && $attributeStatusOk) {
                 $product['attributes'] = json_decode($product['attributes'], true);
             }
             if (isset($product['prices'])) {
-                $product['prices'] = json_decode($product['prices'], true);
+                $product['prices'] = json_decode($product['prices'], true) ?? [];
             }
             return $product;
         }, $products);
@@ -238,14 +241,17 @@ class ProductResolver
                 $product = $stmt->fetch(\PDO::FETCH_ASSOC);
                 // assoc array
                 $attributeStatusOk = json_decode($product['attributes'])[0]->id != null;
+                if(isset($product['gallery'])){
+                    $product['gallery'] = json_decode($product['gallery']) ?? [];
+                }
                 if(!$attributeStatusOk){
-                    $product['attributes'] = null;
+                    $product['attributes'] = [];
                 }
                 if (isset($product['attributes']) && $attributeStatusOk) {
                     $product['attributes'] = json_decode($product['attributes'], true);
                 }
                 if (isset($product['prices'])) {
-                    $product['prices'] = json_decode($product['prices'], true);
+                    $product['prices'] = json_decode($product['prices'], true) ?? [];
                 }
                 return $product;
             }
