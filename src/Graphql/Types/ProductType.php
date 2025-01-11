@@ -15,9 +15,9 @@ final class ProductType extends ObjectType {
                 'id' => Type::nonNull(Type::string()),
                 'name' => Type::nonNull(Type::string()),
                 'inStock' => Type::nonNull(Type::boolean()),
-                'gallery' => Type::nonNull(Type::string()),
+                'gallery' => Type::listOf(Type::string()),
                 'description' => Type::string(), //can be null
-                'category' => Type::string(),
+                'category' => Type::nonNull(Type::string()),
                 'attributes' => Type::listOf(new AttributeSetType),
                 'brand' => Type::nonNull(Type::string()),
                 'prices' => Type::listOf(new PriceType)
