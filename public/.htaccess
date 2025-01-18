@@ -7,4 +7,10 @@
 
     # Redirect all requests to index.php
     RewriteRule ^(.*)$ index.php [QSA,L]
+
+    #cors config
+    Header set Access-Control-Allow-Origin "http://localhost:3000" 
+    Header set Access-Control-Allow-Methods "POST, GET, OPTIONS" 
+    Header set Access-Control-Allow-Headers "Content-Type, Authorization" 
+    Header set Access-Control-Allow-Credentials "true"
 </IfModule>
