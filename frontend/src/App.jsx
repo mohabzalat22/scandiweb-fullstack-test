@@ -4,18 +4,16 @@ import Header from "./layout/Header";
 import Category from "./pages/Category";
 import ProductDetails from "./pages/ProductDetails";
 import Error from "./pages/Error";
-
-
-
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 function App() {
   return (
-    <>
-    <Header> </Header>
-    <Category></Category>
-    <ProductDetails></ProductDetails>
-    <Error></Error>
-    </>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Category/>}></Route>
+        <Route path="/product/:id" element={<ProductDetails/>}></Route>
+      </Routes>
+    </Router>
   );
 }
 
