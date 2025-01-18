@@ -16,6 +16,13 @@ use App\App;
 class GraphQL extends Controller
 {
     public static function handle() {
+        header('Content-Type: application/json; charset=UTF-8');
+
+        if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+            http_response_code(200);
+            exit;
+        }
+
         try {
             $logger = App::init()->getService('logger');
 
@@ -79,7 +86,6 @@ class GraphQL extends Controller
             ];
         }
 
-        header('Content-Type: application/json; charset=UTF-8');
         return json_encode($output);
     }
 }
