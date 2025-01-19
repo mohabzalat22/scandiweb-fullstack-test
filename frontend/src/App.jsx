@@ -12,6 +12,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Category/>}></Route>
         <Route path="/product/:id" element={<ProductDetails/>}></Route>
+        <Route path="*" element={<Error />} />
       </Routes>
     </Router>
   );
