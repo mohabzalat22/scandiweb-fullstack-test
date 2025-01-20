@@ -4,14 +4,14 @@ namespace App\Controllers;
 
 use App\Controllers\Controller;
 use App\Graphql\Types\QueryType;
+use App\Graphql\Types\MutationType;
 use GraphQL\GraphQL as GraphQLBase;
-use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Schema;
 use RuntimeException;
 use Throwable;
 use GraphQL\Type\SchemaConfig;
 use App\App;
+
 
 class GraphQL extends Controller
 {
@@ -28,19 +28,7 @@ class GraphQL extends Controller
 
             $queryType = new QueryType();
         
-            $mutationType = new ObjectType([
-                'name' => 'Mutation',
-                'fields' => [
-                    'sum' => [
-                        'type' => Type::int(),
-                        'args' => [
-                            'x' => ['type' => Type::int()],
-                            'y' => ['type' => Type::int()],
-                        ],
-                        'resolve' => static fn ($calc, array $args): int => $args['x'] + $args['y'],
-                    ],
-                ],
-            ]);
+            $mutationType = new MutationType();
         
             $schema = new Schema(
                 (new SchemaConfig())
