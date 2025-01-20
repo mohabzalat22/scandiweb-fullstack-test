@@ -58,12 +58,13 @@ const ProductCard = ({ product }) => {
             quantity: 1,
           };
           updatedCartItems = [...prevCartItems, newCartItem];
+          console.log("ci: ", prevCartItems, "up: ", newCartItem);
         }
 
         // Save updated cart in LocalStorage
         localStorage.setItem("cart", JSON.stringify(updatedCartItems));
         window.dispatchEvent(new Event("cartUpdated"));
-
+        window.dispatchEvent(new Event("productQuantityUpdated"));
         return updatedCartItems;
       });
     }
