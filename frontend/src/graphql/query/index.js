@@ -34,6 +34,7 @@ export const GET_PRODUCTS = gql`
           displayValue
           value
         }
+          type
       }
 
       brand
