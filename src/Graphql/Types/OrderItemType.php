@@ -13,7 +13,7 @@ final class OrderItemType extends InputObjectType
             'name' => 'OrderItem',
             'fields' => [
                 'order_id' => Type::int(),
-                'product_id' => Type::int(),
+                'product_id' => Type::string(),
                 'attributes' => Type::string(),
                 'quantity' => Type::int(),
                 'price' => Type::float(),
