@@ -15,7 +15,8 @@ abstract class Model
     public function create(array $data)
     {
         $result = $this->orm->insert($this->table, $data);
-        return $result->rowCount() ?  $this->find($data['id']) : NULL;
+        $id = $this->orm->id();
+        return $result->rowCount() ?  $this->find($id) : NULL;
     }
 
     public function find($id)
