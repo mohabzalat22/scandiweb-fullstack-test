@@ -11,7 +11,7 @@ final class OrderType extends InputObjectType
         parent::__construct([
             'name' => 'Order',
             'fields' => [
-                'order_number' => Type::int(),
+                // 'order_number' => Type::int(),
                 'total_amount' => Type::float(),
                 'currency_id' => Type::int(),
                 // 'status' => Type::string()
