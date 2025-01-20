@@ -6,12 +6,14 @@ import { useQuery } from "@apollo/client";
 import { GET_PRODUCT_BY_ID } from "../graphql/query";
 import Header from "../layout/Header";
 import parse from "html-react-parser";
+import {useSelector } from "react-redux";
+import Overlay from "../components/Overlay";
 
 const ProductDetails = () => {
   const { id } = useParams();
-
   let [product, setProduct] = useState(null);
   let [selectedAttributes, setSelectedAttributes] = useState([]);
+  const showCartMenu = useSelector((state) => state.menu.value);
 
   const addAttribute = (name, value) => {
     let updatedAttributes;
@@ -26,9 +28,6 @@ const ProductDetails = () => {
 
     setSelectedAttributes(updatedAttributes);
   };
-
-  const keyExists = (key) =>
-    selectedAttributes.some((attr) => attr.name === key);
 
   const getAttribute = (key) =>
     selectedAttributes.find((attr) => attr.name === key);
@@ -52,11 +51,71 @@ const ProductDetails = () => {
   }, [gallery]);
 
   const getImageIndex = (src) => gallery.findIndex((el) => el === src);
+  let [cartItems, setCartItems] = useState(() => {
+    // Initialize cartItems with data from localStorage if available
+    const savedCart = localStorage.getItem("cart");
+    return savedCart ? JSON.parse(savedCart) : [];
+  });
+
+  const addToCart = () => {
+    if (product.attributes.length === selectedAttributes.length) {
+      // Check if the product is already in the cart
+      const existingItemIndex = cartItems.findIndex(
+        (item) =>
+          JSON.stringify(item.selectedAttributes) ===
+          JSON.stringify(selectedAttributes)
+      );
+
+      if (existingItemIndex >= 0) {
+        // Update quantity if already in cart
+        cartItems[existingItemIndex].quantity += 1;
+      } else {
+        // Add new product to cart
+        cartItems.push({
+          id: product.id,
+          name: product.name,
+          prices: product?.prices,
+          gallery: product?.gallery,
+          attributes: product?.attributes,
+          selectedAttributes: selectedAttributes,
+          quantity: 1,
+        });
+      }
+
+      // Save updated cart in LocalStorage
+      localStorage.setItem("cart", JSON.stringify(cartItems));
+      window.dispatchEvent(new Event("cartUpdated"));
+    }
+  };
+
+  useEffect(() => {
+    const handleProductQuantityUpdated = (event) => {
+      const savedCart = localStorage.getItem("cart");
+      if (savedCart) {
+        setCartItems(JSON.parse(savedCart));
+      }
+    };
+
+    // Listen for the custom event 'productQuantityUpdated'
+    window.addEventListener(
+      "productQuantityUpdated",
+      handleProductQuantityUpdated
+    );
+
+    // Cleanup event listener when the component unmounts
+    return () => {
+      window.removeEventListener(
+        "productQuantityUpdated",
+        handleProductQuantityUpdated
+      );
+    };
+  }, []);
 
   // console.log(product);
   return (
     <>
-      <Header></Header>
+      <Header/>
+      {showCartMenu && <Overlay />}
       {product != null && (
         <div className="container mx-auto xl:px-24 mt-20">
           <div className="xl:grid xl:grid-cols-12">
@@ -79,14 +138,15 @@ const ProductDetails = () => {
                     <div className="w-[575px] h-[478px] overflow-hidden relative">
                       <img
                         src={selectedImage}
-                        className="object-cover object-center w-full h-full absolute z-20"
+                        className="object-cover object-center w-full h-full absolute"
                       />
                       <div className="absolute z-30 top-1/2 -translate-y-1/2 w-full">
                         <div className="flex justify-between w-full px-4">
                           <button
                             onClick={() =>
-                              (getImageIndex(selectedImage) - 1 >= 0) && setSelectedImage(
-                                gallery[getImageIndex(selectedImage) - 1] 
+                              getImageIndex(selectedImage) - 1 >= 0 &&
+                              setSelectedImage(
+                                gallery[getImageIndex(selectedImage) - 1]
                               )
                             }
                           >
@@ -94,7 +154,9 @@ const ProductDetails = () => {
                           </button>
                           <button
                             onClick={() =>
-                              (getImageIndex(selectedImage) + 1 < gallery.length) && setSelectedImage(
+                              getImageIndex(selectedImage) + 1 <
+                                gallery.length &&
+                              setSelectedImage(
                                 gallery[getImageIndex(selectedImage) + 1]
                               )
                             }
@@ -183,12 +245,27 @@ const ProductDetails = () => {
                         </p>
                       </div>
 
-                      <button className="w-full py-4 text-center bg-secondary text-white">
-                        ADD TO CART
-                      </button>
+                     {
+                      product?.inStock &&  
+                      <button
+                      onClick={() => {
+                        addToCart();
+                      }}
+                      className={`w-full py-4 text-center ${
+                        product.attributes.length ===
+                        selectedAttributes.length
+                          ? "bg-secondary"
+                          : "bg-green-300 disabled"
+                      } text-white`}
+                    >
+                      ADD TO CART
+                    </button>
+                     }
 
                       {/* description */}
-                      <div className="py-10 description">{parse(product.description)}</div>
+                      <div className="py-10 description">
+                        {parse(product.description)}
+                      </div>
                     </div>
                   </div>
                 </div>
