@@ -33,6 +33,7 @@ const Header = () => {
 
   useEffect(() => {
     const handleCartChange = () => {
+      dispatch(setShowMenu(true));
       updateCartItems(); // Update cartItems when the custom event is triggered
     };
 
