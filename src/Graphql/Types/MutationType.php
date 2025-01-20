@@ -2,6 +2,7 @@
 
 namespace App\Graphql\Types;
 
+use App\Graphql\Resolvers\OrderResolver;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 
@@ -33,7 +34,7 @@ final class MutationType extends ObjectType
 
                     'resolve' => function ($root, $args) {
                         $order = $args['order'];
-                        return json_encode($order);
+                        return OrderResolver::CreateOrder($order);
                     }
 
                 ]
