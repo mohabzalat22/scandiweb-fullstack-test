@@ -21,4 +21,3 @@ final class OrderItemType extends InputObjectType
         ]);
     }
 }
-
