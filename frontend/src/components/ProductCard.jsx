@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import QuickShopIcon from "../assets/icons/QuickShopIcon";
 import { Link, useNavigate } from "react-router-dom";
+import formatToKebabCase from '../utils/kebab-case-helper';
 
 const ProductCard = ({ product }) => {
   const navigate = useNavigate();
@@ -93,6 +94,7 @@ const ProductCard = ({ product }) => {
 
   return (
     <div
+      data-testid={`product-${formatToKebabCase(product.name)}`}
       onClick={handleProductCardClick} // Handle click on the entire ProductCard
       className="xl:max-w-[386px] xl:max-h-[444px] group p-4 hover:shadow-all duration-500 col-span-1 cursor-pointer"
     >

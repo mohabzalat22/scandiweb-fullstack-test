@@ -8,6 +8,7 @@ import Header from "../layout/Header";
 import parse from "html-react-parser";
 import {useSelector } from "react-redux";
 import Overlay from "../components/Overlay";
+import formatToKebabCase from "../utils/kebab-case-helper";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -120,7 +121,9 @@ const ProductDetails = () => {
         <div className="container mx-auto xl:px-24 mt-20">
           <div className="xl:grid xl:grid-cols-12">
             {/* GALLERY */}
-            <div className="xl:col-span-1 xl:flex-col my-2 xl:m-0 flex gap-4 max-h-[478px] overflow-y-scroll scrollbar-hide">
+            <div
+            data-testid='product-gallery'
+            className="xl:col-span-1 xl:flex-col my-2 xl:m-0 flex gap-4 max-h-[478px] overflow-y-scroll scrollbar-hide">
               {product.gallery.map((src, i) => (
                 <div
                   key={i}
@@ -174,7 +177,7 @@ const ProductDetails = () => {
                       {/* attributes */}
                       {product.attributes?.map((attr) =>
                         attr.type == "text" ? (
-                          <div className="mt-8">
+                          <div data-testid={`product-attribute-${formatToKebabCase(attr.name)}`} className="mt-8">
                             <p className="uppercase font-[800]">{attr.name}:</p>
                             <div className="mt-2 flex">
                               {attr.items.map((item) =>
@@ -248,6 +251,7 @@ const ProductDetails = () => {
                      {
                       product?.inStock &&  
                       <button
+                      data-testid='add-to-cart'
                       onClick={() => {
                         addToCart();
                       }}
@@ -263,7 +267,9 @@ const ProductDetails = () => {
                      }
 
                       {/* description */}
-                      <div className="py-10 description">
+                      <div
+                      data-testid='product-description'
+                       className="py-10 description">
                         {parse(product.description)}
                       </div>
                     </div>

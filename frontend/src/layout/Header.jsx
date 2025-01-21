@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setCategory } from "../rtk/slices/categorySlice";
 import { setShowMenu } from "../rtk/slices/menuSlice";
 import { Link } from "react-router-dom";
+import formatToKebabCase from '../utils/kebab-case-helper';
 
 const Header = () => {
   const { loading, error, data } = useQuery(GET_CATEGORIES);
@@ -133,6 +134,7 @@ const Header = () => {
     
   }
 
+
   return (
     <>
       <header className="pt-6 relative z-50 bg-white">
@@ -142,6 +144,7 @@ const Header = () => {
             {categories.map((el) =>
               category == el ? (
                 <li
+                  data-testid='active-category-link'
                   key={el}
                   className="pt-1 pb-8 px-4 border-b-2 border-b-secondary font-[600]"
                 >
@@ -151,6 +154,7 @@ const Header = () => {
                 </li>
               ) : (
                 <li
+                  data-testid='category-link'
                   key={el}
                   className="pt-1 pb-8 px-4"
                   onClick={() => {
@@ -173,7 +177,7 @@ const Header = () => {
           </div>
 
           {/* cart button */}
-          <div className="col-span-1 flex justify-end me-4">
+          <div data-testid='cart-btn' className="col-span-1 flex justify-end me-4">
             <div className="p-0.5 relative">
               <button className={`${cartItems.length>0 ? "" :"bg-gray-400 mix-blend-hard-light"}`}
                 onClick={() => {
@@ -186,7 +190,7 @@ const Header = () => {
               </button>
               {cartItems.length > 0 && (
                 <div className="absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 bg-primary w-6 h-6 rounded-full flex justify-center items-start">
-                  <p className="text-white g-0 text-sm">{cartItems.length}</p>
+                  <p data-testid='cart-item-amount' className="text-white g-0 text-sm">{cartItems.length}</p>
                 </div>
               )}
             </div>
@@ -216,6 +220,7 @@ const Header = () => {
                 <div>
                   {cartItems.map((el) => (
                     <div
+                      
                       className="grid grid-cols-12 mb-8"
                       key={generateUniqueId(el)}
                     >
@@ -232,7 +237,7 @@ const Header = () => {
                         {/* attributes */}
                         {el.attributes.map((attr) =>
                           attr.type == "text" ? (
-                            <div className="mt-2">
+                            <div  className="mt-2" data-testid={`cart-item-attribute-${formatToKebabCase(el.name)}`}>
                               <p className="text-sm capitalize">{attr.name}:</p>
                               <div className="mt-1 flex flex-wrap">
                                 {attr.items?.map((item) => (
@@ -253,19 +258,20 @@ const Header = () => {
                               </div>
                             </div>
                           ) : (
-                            <div className="mt-2">
+                            <div className="mt-2" data-testid={`cart-item-attribute-${formatToKebabCase(el.name)}`}>
                               <p className="text-sm capitalize">{attr.name}:</p>
                               <div className="mt-1 flex flex-wrap">
                                 {attr.items?.map((item) => (
                                   el.selectedAttributes.some(
                                     (obj) => obj.name === attr.name && obj.value === item.displayValue // Check key and value
                                   ) ?
-                                  <div
+                                  <div 
+                                    data-testid={`cart-item-attribute-${formatToKebabCase(el.name)}-selected`}
                                     className="p-3 m-1 outline outline-2 outline-offset-2 outline-secondary"
                                     style={{ backgroundColor: item.value }}
                                   ></div>
                                   : 
-                                  <div
+                                  <div data-testid={`cart-item-attribute-${formatToKebabCase(el.name)}`}
                                   className="p-3 m-1"
                                   style={{ backgroundColor: item.value }}
                                 ></div>
@@ -278,6 +284,7 @@ const Header = () => {
                       {/* counter */}
                       <div className="col-span-1 flex flex-col justify-between">
                         <button
+                          data-testid='cart-item-amount-increase'
                           onClick={() => increaseQuantity(el)} // Pass the entire item object
                           className="w-8 h-8 border-2 border-primary flex justify-center items-center text-3xl g-0"
                         >
@@ -285,6 +292,7 @@ const Header = () => {
                         </button>
                         <p className="text-center font-bold">{el.quantity}</p>
                         <button
+                          data-testid='cart-item-amount-decrease'
                           onClick={() => decreaseQuantity(el)} // Pass the entire item object
                           className="w-8 h-8 border-2 border-primary flex justify-center items-center text-3xl g-0"
                         >
@@ -308,7 +316,7 @@ const Header = () => {
               {/* total */}
               <div className="py-4 mt-8 flex justify-between">
                 <p className="capitalize font-[600]">Total</p>
-                <p className="font-[700] me-2">{cartItems[0]?.prices[0]?.currency?.symbol}{calculateTotal()}</p>
+                <p data-testid='cart-total' className="font-[700] me-2">{cartItems[0]?.prices[0]?.currency?.symbol}{calculateTotal()}</p>
               </div>
               {/* order button */}
               <div className="mt-8">
