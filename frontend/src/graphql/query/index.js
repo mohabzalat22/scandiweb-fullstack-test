@@ -21,6 +21,7 @@ export const GET_PRODUCTS = gql`
       prices {
         amount
         currency {
+          id
           label
           symbol
         }
@@ -55,6 +56,7 @@ export const GET_PRODUCT_BY_ID = gql`
       prices {
         amount
         currency {
+          id
           label
           symbol
         }
