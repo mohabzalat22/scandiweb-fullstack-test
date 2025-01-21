@@ -121,6 +121,9 @@ const Header = () => {
       };
       try {
         const result = await createOrder({ variables: { order: orderData } });
+        localStorage.setItem("cart", "[]");
+        setCartItems([]);
+        window.dispatchEvent(new Event("productQuantityUpdated"));
         console.log("Order created:", result.data.createOrder);
       } catch (err) {
         console.error("Error creating order:", err);
