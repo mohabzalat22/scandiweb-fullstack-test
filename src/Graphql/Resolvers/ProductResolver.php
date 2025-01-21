@@ -33,6 +33,7 @@ class ProductResolver
                     JSON_ARRAYAGG(
                         JSON_OBJECT(
                             'currency', JSON_OBJECT(
+                                'id', cur.id,
                                 'label', cur.label, 
                                 'symbol', cur.symbol
                             ),
@@ -100,6 +101,7 @@ class ProductResolver
                             JSON_ARRAYAGG(
                                 JSON_OBJECT(
                                     'currency', JSON_OBJECT(
+                                        'id', cur.id,
                                         'label', cur.label, 
                                         'symbol', cur.symbol
                                     ),
@@ -192,6 +194,7 @@ class ProductResolver
                     JSON_ARRAYAGG(
                         JSON_OBJECT(
                             'currency', JSON_OBJECT(
+                                'id', cur.id,
                                 'label', cur.label, 
                                 'symbol', cur.symbol
                             ),
