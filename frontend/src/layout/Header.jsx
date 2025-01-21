@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import BrandIcon from "./../assets/icons/BrandIcon";
 import CartIcon from "./../assets/icons/CartIcon";
-import { GET_CATEGORIES } from "../graphql/query";
-import { useQuery } from "@apollo/client";
+import { GET_CATEGORIES} from "../graphql/query";
+import { CREATE_NEW_ORDER } from "../graphql/query";
+import { useQuery, useMutation} from "@apollo/client";
 import { useDispatch, useSelector } from "react-redux";
 import { setCategory } from "../rtk/slices/categorySlice";
 import { setShowMenu } from "../rtk/slices/menuSlice";
@@ -99,6 +100,35 @@ const Header = () => {
       dispatch(setShowMenu(false));
     }
   }, [cartItems]);
+
+  // mutation
+  const [createOrder] = useMutation(CREATE_NEW_ORDER);
+  const createNewOrder = async() => {
+
+    if(cartItems.length > 0){
+      let orderItems = cartItems.map((el)=>{
+        return {
+          'product_id' : el.id,
+          'quantity' : el.quantity,
+          'price' : +el.prices[0].amount,
+          'attributes'  : JSON.stringify(el.selectedAttributes),
+        };
+      });      
+      const orderData = {
+        total_amount: +calculateTotal(),
+        currency_id: cartItems[0].prices[0].currency.id,
+        items: orderItems
+      };
+      try {
+        const result = await createOrder({ variables: { order: orderData } });
+        console.log("Order created:", result.data.createOrder);
+      } catch (err) {
+        console.error("Error creating order:", err);
+      }
+    }
+  
+    
+  }
 
   return (
     <>
@@ -279,7 +309,9 @@ const Header = () => {
               </div>
               {/* order button */}
               <div className="mt-8">
-                <button className="bg-secondary text-center py-3 w-full font-[500] text-white">
+                <button onClick={()=>
+                  {createNewOrder()}
+                } className="bg-secondary text-center py-3 w-full font-[500] text-white">
                   PLACE ORDER
                 </button>
               </div>
