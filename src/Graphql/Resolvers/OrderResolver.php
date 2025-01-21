@@ -56,7 +56,7 @@ class OrderResolver
         if ($orderItemsAreValid) {
             // total validation vs items
             $totalAmountCalculated = array_reduce($orderItems, function ($acc, $el) {
-                return $acc + $el['price'];
+                return $acc + $el['price'] * $el['quantity'];
             }, 0);
 
             if ($totalAmountCalculated == $orderData['total_amount']) {
