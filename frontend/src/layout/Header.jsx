@@ -175,9 +175,9 @@ const Header = () => {
                     dispatch(setCategory(el));
                   }}
                 >
-                  <p className="uppercase text-base/[20px] text-primary">
+                  <a href={`/${el}`} onClick={(e)=>{e.preventDefault();}} className="uppercase text-base/[20px] text-primary">
                     {el}
-                  </p>
+                  </a>
                 </li>
               )
             )}
