@@ -154,34 +154,37 @@ const Header = () => {
       <header className="pt-6 relative z-50 bg-white">
         <div className="container mx-auto grid grid-cols-3 gap-1  xl:px-24">
           {/* categories */}
-          <ul className="flex col-span-1 cursor-pointer">
+          <div className="flex col-span-1 cursor-pointer">
             {categories.map((el) =>
               category == el ? (
-                <li
+                <a
+                  href={`/${el}`} onClick={(e)=>{e.preventDefault();}}
                   data-testid='active-category-link'
                   key={el}
                   className="pt-1 pb-8 px-4 border-b-2 border-b-secondary font-[600]"
                 >
-                  <a href={`/${el}`} onClick={(e)=>{e.preventDefault();}} className="uppercase text-base/[20px] text-secondary">
+                  <p className="uppercase text-base/[20px] text-secondary">
                     {el}
-                  </a>
-                </li>
+                  </p>
+                </a>
               ) : (
-                <li
+                <a
+                  href={`/${el}`}
                   data-testid='category-link'
                   key={el}
                   className="pt-1 pb-8 px-4"
                   onClick={() => {
+                    e.preventDefault();
                     dispatch(setCategory(el));
                   }}
                 >
-                  <a href={`/${el}`} onClick={(e)=>{e.preventDefault();}} className="uppercase text-base/[20px] text-primary">
+                  <p className="uppercase text-base/[20px] text-primary">
                     {el}
-                  </a>
-                </li>
+                  </p>
+                </a>
               )
             )}
-          </ul>
+          </div>
           <div className="col-span-1 flex justify-center">
             <div className="p-1">
               <Link to="/">
