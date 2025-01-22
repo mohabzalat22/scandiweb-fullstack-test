@@ -98,12 +98,12 @@ const ProductCard = ({ product }) => {
       onClick={handleProductCardClick} // Handle click on the entire ProductCard
       className="xl:max-w-[386px] xl:max-h-[444px] group p-4 hover:shadow-all duration-500 col-span-1 cursor-pointer"
     >
-      <div className="xl:max-w-[354px] xl:max-h-[330px] relative overflow-hidden">
+      <div className="xl:max-w-[354px] aspect-[4/3] xl:max-h-[330px] relative overflow-hidden">
         {/* overlay */}
         {product.inStock ? (
           <img
             src={product.gallery[0]}
-            className="object-cover object-top w-full h-full"
+            className="object-contain object-top w-full h-full"
             alt={product.name}
           />
         ) : (
@@ -115,7 +115,7 @@ const ProductCard = ({ product }) => {
             </div>
             <img
               src={product.gallery[0]}
-              className="object-cover object-top w-full h-full"
+              className="object-contain object-top w-full h-full"
               alt={product.name}
             />
           </>
