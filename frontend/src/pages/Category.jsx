@@ -5,6 +5,7 @@ import { GET_PRODUCTS } from "../graphql/query";
 import { useSelector } from "react-redux"; // Import useSelector
 import Header from "../layout/Header";
 import Overlay from "../components/Overlay";
+import Loading from '../pages/Loading';
 
 const Category = () => {
   const category = useSelector((state) => state.category.value);
@@ -14,6 +15,10 @@ const Category = () => {
   });
 
   const products = data?.products || [];
+
+  if(loading){
+    return <Loading/>
+  }
 
   return (
     <>
