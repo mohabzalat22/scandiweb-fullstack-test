@@ -123,17 +123,18 @@ const ProductDetails = () => {
             {/* GALLERY */}
             <div
             data-testid='product-gallery'
-            className="xl:col-span-1 xl:flex-col my-2 xl:m-0 flex gap-4 max-h-[478px] overflow-y-scroll scrollbar-hide">
+            className="flex xl:col-span-1 xl:flex-col my-2 xl:m-0 gap-4 max-h-[478px]  overflow-y-scroll scrollbar-hide">
               {product.gallery.map((src, i) => (
                 <div
                   key={i}
-                  className="w-20 h-20 overflow-hidden"
+                  className="w-20 h-20 aspect-square"
                   onClick={() => setSelectedImage(src)}
                 >
                   <img src={src} className="object-cover w-full h-full" />
                 </div>
               ))}
             </div>
+            {/* main image */}
             <div className="xl:col-span-11">
               <div className="flex w-full">
                 <div className="xl:grid xl:grid-cols-12">
