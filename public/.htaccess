@@ -9,7 +9,7 @@
     RewriteRule ^(.*)$ index.php [QSA,L]
 
     #cors config
-    Header set Access-Control-Allow-Origin "https://scandiweb-fullstack-test-m7wd.vercel.app" 
+    Header set Access-Control-Allow-Origin "*" 
     Header set Access-Control-Allow-Methods "POST, GET, OPTIONS" 
     Header set Access-Control-Allow-Headers "Content-Type, Authorization" 
     Header set Access-Control-Allow-Credentials "true"
