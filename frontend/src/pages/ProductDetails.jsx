@@ -141,7 +141,7 @@ const ProductDetails = () => {
                     <div className="w-[575px] h-[478px] overflow-hidden relative">
                       <img
                         src={selectedImage}
-                        className="object-cover object-center w-full h-full absolute"
+                        className="object-contain object-center w-full h-full absolute"
                       />
                       <div className="absolute z-30 top-1/2 -translate-y-1/2 w-full">
                         <div className="flex justify-between w-full px-4">
