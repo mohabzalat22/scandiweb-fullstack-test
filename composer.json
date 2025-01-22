@@ -21,6 +21,8 @@
         "nikic/fast-route": "^2.0@dev",
         "webonyx/graphql-php": "dev-master",
         "catfan/medoo": "dev-master",
-        "monolog/monolog": "^3.0@dev"
+        "monolog/monolog": "^3.0@dev",
+        "rakit/validation": "dev-master",
+        "ramsey/uuid": "5.x-dev"
     }
 }

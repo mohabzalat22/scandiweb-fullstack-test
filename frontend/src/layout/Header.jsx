@@ -162,9 +162,9 @@ const Header = () => {
                   key={el}
                   className="pt-1 pb-8 px-4 border-b-2 border-b-secondary font-[600]"
                 >
-                  <p className="uppercase text-base/[20px] text-secondary">
+                  <a href={"/"+ el} className="uppercase text-base/[20px] text-secondary">
                     {el}
-                  </p>
+                  </a>
                 </li>
               ) : (
                 <li
