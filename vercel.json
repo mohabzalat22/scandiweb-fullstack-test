@@ -2,7 +2,7 @@
     "version": 2,
     "builds": [
       {
-        "src": "public/index.php", 
+        "src": "public/index.php",
         "use": "@vercel/php" 
       }
     ],
@@ -11,5 +11,6 @@
         "src": "/(.*)",
         "dest": "/public/index.php" 
       }
-    ]
+    ],
+    "public": "public" 
   }
