@@ -3,14 +3,19 @@ import BrandIcon from "./../assets/icons/BrandIcon";
 import CartIcon from "./../assets/icons/CartIcon";
 import { GET_CATEGORIES} from "../graphql/query";
 import { CREATE_NEW_ORDER } from "../graphql/query";
-import { useQuery, useMutation} from "@apollo/client";
+import { useQuery, useMutation, from} from "@apollo/client";
 import { useDispatch, useSelector } from "react-redux";
 import { setCategory } from "../rtk/slices/categorySlice";
 import { setShowMenu } from "../rtk/slices/menuSlice";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import formatToKebabCase from '../utils/kebab-case-helper';
+import Loading from '../pages/Loading';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Header = () => {
+  const navigate = useNavigate();
+
   const { loading, error, data } = useQuery(GET_CATEGORIES);
   const dispatch = useDispatch();
   let categories = ["all"];
@@ -126,17 +131,26 @@ const Header = () => {
         setCartItems([]);
         window.dispatchEvent(new Event("productQuantityUpdated"));
         console.log("Order created:", result.data.createOrder);
+        navigate(`/success?orderId=${result.data.createOrder}`);
       } catch (err) {
         console.error("Error creating order:", err);
+        toast.error("Error: Please Reload page");
       }
     }
   
     
   }
 
+  if(loading){
+    return <Loading/>
+  }
+  if(error){
+    toast.error("Error: Please Reload page");
+  }
 
   return (
     <>
+    <ToastContainer />
       <header className="pt-6 relative z-50 bg-white">
         <div className="container mx-auto grid grid-cols-3 gap-1  xl:px-24">
           {/* categories */}
