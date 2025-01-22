@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
 import BrandIcon from "./../assets/icons/BrandIcon";
 import CartIcon from "./../assets/icons/CartIcon";
-import { GET_CATEGORIES} from "../graphql/query";
+import { GET_CATEGORIES } from "../graphql/query";
 import { CREATE_NEW_ORDER } from "../graphql/query";
-import { useQuery, useMutation, from} from "@apollo/client";
+import { useQuery, useMutation, from } from "@apollo/client";
 import { useDispatch, useSelector } from "react-redux";
 import { setCategory } from "../rtk/slices/categorySlice";
 import { setShowMenu } from "../rtk/slices/menuSlice";
 import { Link, useNavigate } from "react-router-dom";
-import formatToKebabCase from '../utils/kebab-case-helper';
-import Loading from '../pages/Loading';
+import formatToKebabCase from "../utils/kebab-case-helper";
+import Loading from "../pages/Loading";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -24,7 +24,7 @@ const Header = () => {
   }
 
   let category = useSelector((state) => state.category.value);
-  let showCartMenu = useSelector((state) => state.menu.value);  
+  let showCartMenu = useSelector((state) => state.menu.value);
 
   // Initialize cartItems from localStorage
   let [cartItems, setCartItems] = useState(() => {
@@ -94,36 +94,37 @@ const Header = () => {
   };
 
   const calculateTotal = () => {
-    return cartItems.reduce(
-      (total, item) =>
-        total + item.quantity * parseFloat(item.prices[0]?.amount || 0),
-      0
-    ).toFixed(2);
+    return cartItems
+      .reduce(
+        (total, item) =>
+          total + item.quantity * parseFloat(item.prices[0]?.amount || 0),
+        0
+      )
+      .toFixed(2);
   };
 
   useEffect(() => {
-    if(cartItems.length == 0){
+    if (cartItems.length == 0) {
       dispatch(setShowMenu(false));
     }
   }, [cartItems]);
 
   // mutation
   const [createOrder] = useMutation(CREATE_NEW_ORDER);
-  const createNewOrder = async() => {
-
-    if(cartItems.length > 0){
-      let orderItems = cartItems.map((el)=>{
+  const createNewOrder = async () => {
+    if (cartItems.length > 0) {
+      let orderItems = cartItems.map((el) => {
         return {
-          'product_id' : el.id,
-          'quantity' : el.quantity,
-          'price' : +el.prices[0].amount,
-          'attributes'  : JSON.stringify(el.selectedAttributes),
+          product_id: el.id,
+          quantity: el.quantity,
+          price: +el.prices[0].amount,
+          attributes: JSON.stringify(el.selectedAttributes),
         };
-      });      
+      });
       const orderData = {
         total_amount: +calculateTotal(),
         currency_id: cartItems[0].prices[0].currency.id,
-        items: orderItems
+        items: orderItems,
       };
       try {
         const result = await createOrder({ variables: { order: orderData } });
@@ -137,20 +138,18 @@ const Header = () => {
         toast.error("Error: Please Reload page");
       }
     }
-  
-    
-  }
+  };
 
-  if(loading){
-    return <Loading/>
+  if (loading) {
+    return <Loading />;
   }
-  if(error){
+  if (error) {
     toast.error("Error: Please Reload page");
   }
 
   return (
     <>
-    <ToastContainer />
+      <ToastContainer />
       <header className="pt-6 relative z-50 bg-white">
         <div className="container mx-auto grid grid-cols-3 gap-1  xl:px-24">
           {/* categories */}
@@ -158,8 +157,11 @@ const Header = () => {
             {categories.map((el) =>
               category == el ? (
                 <a
-                  href={`/${el}`} onClick={(e)=>{e.preventDefault();}}
-                  data-testid='active-category-link'
+                  href={`/${el}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                  }}
+                  data-testid="active-category-link"
                   key={el}
                   className="pt-1 pb-8 px-4 border-b-2 border-b-secondary font-[600]"
                 >
@@ -170,10 +172,10 @@ const Header = () => {
               ) : (
                 <a
                   href={`/${el}`}
-                  data-testid='category-link'
+                  data-testid="category-link"
                   key={el}
                   className="pt-1 pb-8 px-4"
-                  onClick={() => {
+                  onClick={(e) => {
                     e.preventDefault();
                     dispatch(setCategory(el));
                   }}
@@ -194,11 +196,17 @@ const Header = () => {
           </div>
 
           {/* cart button */}
-          <div data-testid='cart-btn' className="col-span-1 flex justify-end me-4">
+          <div
+            data-testid="cart-btn"
+            className="col-span-1 flex justify-end me-4"
+          >
             <div className="p-0.5 relative">
-              <button className={`${cartItems.length>0 ? "" :"bg-gray-400 mix-blend-hard-light"}`}
+              <button
+                className={`${
+                  cartItems.length > 0 ? "" : "bg-gray-400 mix-blend-hard-light"
+                }`}
                 onClick={() => {
-                  if(cartItems.length>0){
+                  if (cartItems.length > 0) {
                     dispatch(setShowMenu(!showCartMenu));
                   }
                 }}
@@ -207,7 +215,12 @@ const Header = () => {
               </button>
               {cartItems.length > 0 && (
                 <div className="absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 bg-primary w-6 h-6 rounded-full flex justify-center items-start">
-                  <p data-testid='cart-item-amount' className="text-white g-0 text-sm">{cartItems.length}</p>
+                  <p
+                    data-testid="cart-item-amount"
+                    className="text-white g-0 text-sm"
+                  >
+                    {cartItems.length}
+                  </p>
                 </div>
               )}
             </div>
@@ -215,137 +228,168 @@ const Header = () => {
         </div>
 
         {/* Cart menu */}
-        {
-           showCartMenu &&
-           <div className="container mx-auto xl:px-24 relative z-50">
+        {showCartMenu && (
+          <div className="container mx-auto xl:px-24 relative z-50">
             <div className="w-[350px] px-4 py-6 absolute xl:end-24 end-0 bg-white">
               {cartItems.length > 0 && (
-                <>     
-                <div className="mb-8">
-                  <span className="capitalize font-[600]">my bag,</span>
-                  {cartItems.length > 1 ? (
-                    <span>
-                      <span className="mx-0.5"> {cartItems.length} </span>items
-                    </span>
-                  ) : (
-                    <span>
-                      <span className="mx-0.5"> {cartItems.length} </span>item
-                    </span>
-                  )}
-                </div>
-                {/* Cart items */}
-                <div>
-                  {cartItems.map((el) => (
-                    <div
-                      
-                      className="grid grid-cols-12 mb-8"
-                      key={generateUniqueId(el)}
-                    >
-                      <div className="col-span-5 flex flex-col justify-between">
-                        <div className="mb-1">
-                          <p className="text-lg font-[300] text-primary">
-                            {el.name}
-                          </p>
-                          <p className="text-base text-primary font-[600] my-1">
-                            {el.prices[0]?.currency.symbol}
-                            {parseFloat(el.prices[0]?.amount).toFixed(2)}
-                          </p>
-                        </div>
-                        {/* attributes */}
-                        {el.attributes.map((attr) =>
-                          attr.type == "text" ? (
-                            <div  className="mt-2" data-testid={`cart-item-attribute-${formatToKebabCase(el.name)}`}>
-                              <p className="text-sm capitalize">{attr.name}:</p>
-                              <div className="mt-1 flex flex-wrap">
-                                {attr.items?.map((item) => (
-                                  el.selectedAttributes.some(
-                                    (obj) => obj.name === attr.name && obj.value === item.value // Check key and value
-                                  ) ? <div className="m-1 border-2 border-primary bg-primary flex justify-center items-center">
-                                    <p className="text-xs text-white uppercase p-1">
-                                      {item.value}
-                                    </p>
-                                  </div>
-                                  :
-                                  <div className="m-1 border-2 border-primary flex justify-center items-center">
-                                    <p className="text-xs uppercase p-1">
-                                      {item.value}
-                                    </p>
-                                  </div>
-                                ))}
+                <>
+                  <div className="mb-8">
+                    <span className="capitalize font-[600]">my bag,</span>
+                    {cartItems.length > 1 ? (
+                      <span>
+                        <span className="mx-0.5"> {cartItems.length} </span>
+                        items
+                      </span>
+                    ) : (
+                      <span>
+                        <span className="mx-0.5"> {cartItems.length} </span>item
+                      </span>
+                    )}
+                  </div>
+                  {/* Cart items */}
+                  <div>
+                    {cartItems.map((el) => (
+                      <div
+                        className="grid grid-cols-12 mb-8"
+                        key={generateUniqueId(el)}
+                      >
+                        <div className="col-span-5 flex flex-col justify-between">
+                          <div className="mb-1">
+                            <p className="text-lg font-[300] text-primary">
+                              {el.name}
+                            </p>
+                            <p className="text-base text-primary font-[600] my-1">
+                              {el.prices[0]?.currency.symbol}
+                              {parseFloat(el.prices[0]?.amount).toFixed(2)}
+                            </p>
+                          </div>
+                          {/* attributes */}
+                          {el.attributes.map((attr) =>
+                            attr.type == "text" ? (
+                              <div
+                                className="mt-2"
+                                data-testid={`cart-item-attribute-${formatToKebabCase(
+                                  el.name
+                                )}`}
+                              >
+                                <p className="text-sm capitalize">
+                                  {attr.name}:
+                                </p>
+                                <div className="mt-1 flex flex-wrap">
+                                  {attr.items?.map((item) =>
+                                    el.selectedAttributes.some(
+                                      (obj) =>
+                                        obj.name === attr.name &&
+                                        obj.value === item.value // Check key and value
+                                    ) ? (
+                                      <div className="m-1 border-2 border-primary bg-primary flex justify-center items-center">
+                                        <p className="text-xs text-white uppercase p-1">
+                                          {item.value}
+                                        </p>
+                                      </div>
+                                    ) : (
+                                      <div className="m-1 border-2 border-primary flex justify-center items-center">
+                                        <p className="text-xs uppercase p-1">
+                                          {item.value}
+                                        </p>
+                                      </div>
+                                    )
+                                  )}
+                                </div>
                               </div>
-                            </div>
-                          ) : (
-                            <div className="mt-2" data-testid={`cart-item-attribute-${formatToKebabCase(el.name)}`}>
-                              <p className="text-sm capitalize">{attr.name}:</p>
-                              <div className="mt-1 flex flex-wrap">
-                                {attr.items?.map((item) => (
-                                  el.selectedAttributes.some(
-                                    (obj) => obj.name === attr.name && obj.value === item.displayValue // Check key and value
-                                  ) ?
-                                  <div 
-                                    data-testid={`cart-item-attribute-${formatToKebabCase(el.name)}-selected`}
-                                    className="p-3 m-1 outline outline-2 outline-offset-2 outline-secondary"
-                                    style={{ backgroundColor: item.value }}
-                                  ></div>
-                                  : 
-                                  <div data-testid={`cart-item-attribute-${formatToKebabCase(el.name)}`}
-                                  className="p-3 m-1"
-                                  style={{ backgroundColor: item.value }}
-                                ></div>
-                                ))}
+                            ) : (
+                              <div
+                                className="mt-2"
+                                data-testid={`cart-item-attribute-${formatToKebabCase(
+                                  el.name
+                                )}`}
+                              >
+                                <p className="text-sm capitalize">
+                                  {attr.name}:
+                                </p>
+                                <div className="mt-1 flex flex-wrap">
+                                  {attr.items?.map((item) =>
+                                    el.selectedAttributes.some(
+                                      (obj) =>
+                                        obj.name === attr.name &&
+                                        obj.value === item.displayValue // Check key and value
+                                    ) ? (
+                                      <div
+                                        data-testid={`cart-item-attribute-${formatToKebabCase(
+                                          el.name
+                                        )}-selected`}
+                                        className="p-3 m-1 outline outline-2 outline-offset-2 outline-secondary"
+                                        style={{ backgroundColor: item.value }}
+                                      ></div>
+                                    ) : (
+                                      <div
+                                        data-testid={`cart-item-attribute-${formatToKebabCase(
+                                          el.name
+                                        )}`}
+                                        className="p-3 m-1"
+                                        style={{ backgroundColor: item.value }}
+                                      ></div>
+                                    )
+                                  )}
+                                </div>
                               </div>
-                            </div>
-                          )
-                        )}
-                      </div>
-                      {/* counter */}
-                      <div className="col-span-1 flex flex-col justify-between">
-                        <button
-                          data-testid='cart-item-amount-increase'
-                          onClick={() => increaseQuantity(el)} // Pass the entire item object
-                          className="w-8 h-8 border-2 border-primary flex justify-center items-center text-3xl g-0"
-                        >
-                          +
-                        </button>
-                        <p className="text-center font-bold">{el.quantity}</p>
-                        <button
-                          data-testid='cart-item-amount-decrease'
-                          onClick={() => decreaseQuantity(el)} // Pass the entire item object
-                          className="w-8 h-8 border-2 border-primary flex justify-center items-center text-3xl g-0"
-                        >
-                          -
-                        </button>
-                      </div>
-                      {/* image */}
-                      <div className="col-span-6 ps-4 h-full flex items-center">
-                        <div className="xl:max-w-[122px] w-full">
-                          <img
-                            src={el.gallery[0]}
-                            className="object-cover object-top w-full h-full"
-                          />
+                            )
+                          )}
+                        </div>
+                        {/* counter */}
+                        <div className="col-span-1 flex flex-col justify-between">
+                          <button
+                            data-testid="cart-item-amount-increase"
+                            onClick={() => increaseQuantity(el)} // Pass the entire item object
+                            className="w-8 h-8 border-2 border-primary flex justify-center items-center text-3xl g-0"
+                          >
+                            +
+                          </button>
+                          <p className="text-center font-bold">{el.quantity}</p>
+                          <button
+                            data-testid="cart-item-amount-decrease"
+                            onClick={() => decreaseQuantity(el)} // Pass the entire item object
+                            className="w-8 h-8 border-2 border-primary flex justify-center items-center text-3xl g-0"
+                          >
+                            -
+                          </button>
+                        </div>
+                        {/* image */}
+                        <div className="col-span-6 ps-4 h-full flex items-center">
+                          <div className="xl:max-w-[122px] w-full">
+                            <img
+                              src={el.gallery[0]}
+                              className="object-cover object-top w-full h-full"
+                            />
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
                 </>
               )}
               {/* total */}
               <div className="py-4 mt-8 flex justify-between">
                 <p className="capitalize font-[600]">Total</p>
-                <p data-testid='cart-total' className="font-[700] me-2">{cartItems[0]?.prices[0]?.currency?.symbol}{calculateTotal()}</p>
+                <p data-testid="cart-total" className="font-[700] me-2">
+                  {cartItems[0]?.prices[0]?.currency?.symbol}
+                  {calculateTotal()}
+                </p>
               </div>
               {/* order button */}
               <div className="mt-8">
-                <button onClick={()=>
-                  {createNewOrder()}
-                } className="bg-secondary text-center py-3 w-full font-[500] text-white">
+                <button
+                  onClick={() => {
+                    createNewOrder();
+                  }}
+                  className="bg-secondary text-center py-3 w-full font-[500] text-white"
+                >
                   PLACE ORDER
                 </button>
               </div>
             </div>
           </div>
-        }
+        )}
       </header>
     </>
   );
