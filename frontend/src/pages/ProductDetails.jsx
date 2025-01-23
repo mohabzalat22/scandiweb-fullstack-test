@@ -174,6 +174,152 @@ const ProductDetails = () => {
     </div>
   );
 
+  // Product description and cart
+  const TextAttribute = ({ attr, selectedValue, onSelect }) => (
+    <div
+      data-testid={`product-attribute-${formatToKebabCase(attr.name)}`}
+      className="mt-8"
+    >
+      <p className="uppercase font-[800]">{attr.name}:</p>
+      <div className="mt-2 flex">
+        {attr.items.map((item) => (
+          <div
+            key={item.value}
+            data-testid={`product-attribute-${formatToKebabCase(
+              attr.name
+            )}-${formatToKebabCaseSensitive(item.value)}`}
+            onClick={() => onSelect(attr.name, item.value)}
+            className={`me-1 w-16 h-10 flex justify-center items-center ${
+              selectedValue === item.value
+                ? "bg-primary"
+                : "border-2 border-primary"
+            }`}
+          >
+            <p
+              className={`uppercase text-sm ${
+                selectedValue === item.value ? "text-white" : "text-primary"
+              }`}
+            >
+              {item.value}
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  // ColorAttribute Component
+  const ColorAttribute = ({ attr, selectedValue, onSelect }) => (
+    <div
+      data-testid={`product-attribute-${formatToKebabCase(attr.name)}`}
+      className="mt-8"
+    >
+      <p className="uppercase font-[800]">{attr.name}:</p>
+      <div className="mt-2 flex">
+        {attr.items.map((item) => (
+          <div
+            key={item.displayValue}
+            data-testid={`product-attribute-${formatToKebabCase(
+              attr.name
+            )}-${formatToKebabCaseSensitive(item.displayValue)}`}
+            onClick={() => onSelect(attr.name, item.displayValue)}
+            className={`p-4 me-2 ${
+              selectedValue === item.displayValue
+                ? "outline outline-offset-2 outline-4 outline-secondary"
+                : ""
+            }`}
+            style={{ backgroundColor: item.value }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+
+  // Price Component
+  const Price = ({ price }) => (
+    <div className="py-6">
+      <p className="uppercase font-[700]">price:</p>
+      <p className="text-2xl font-[700] my-2">
+        {price?.currency?.symbol}
+        {price?.amount}
+      </p>
+    </div>
+  );
+
+  // AddToCartButton Component
+  const AddToCartButton = ({ isDisabled, onClick }) => (
+    <button
+      data-testid="add-to-cart"
+      disabled={isDisabled}
+      onClick={onClick}
+      className={`w-full py-4 text-center ${
+        isDisabled ? "bg-green-300" : "bg-secondary"
+      } text-white`}
+    >
+      ADD TO CART
+    </button>
+  );
+
+  // ProductDescription Component
+  const ProductDescription = ({ description }) => (
+    <div data-testid="product-description" className="py-10 description">
+      {parse(description)}
+    </div>
+  );
+
+  // ProductDetails Component
+  const ProductDetails = ({
+    product,
+    selectedAttributes,
+    addAttribute,
+    addToCart,
+  }) => {
+    const getAttribute = (key) =>
+      selectedAttributes.find((attr) => attr.name === key);
+
+    return (
+      <div className="xl:col-span-4">
+        <div className="xl:ms-20 mt-4 xl:mt-0">
+          <p className="text-3xl font-[600]">{product.name}</p>
+
+          {/* Render Attributes */}
+          {product.attributes?.map((attr) =>
+            attr.type === "text" ? (
+              <TextAttribute
+                key={attr.name}
+                attr={attr}
+                selectedValue={getAttribute(attr.name)?.value}
+                onSelect={addAttribute}
+              />
+            ) : (
+              <ColorAttribute
+                key={attr.name}
+                attr={attr}
+                selectedValue={getAttribute(attr.name)?.value}
+                onSelect={addAttribute}
+              />
+            )
+          )}
+
+          {/* Price */}
+          <Price price={product?.prices[0]} />
+
+          {/* Add to Cart Button */}
+          <AddToCartButton
+            isDisabled={
+              !product.inStock ||
+              product.attributes.length !== selectedAttributes.length
+            }
+            onClick={addToCart}
+          />
+
+          {/* Product Description */}
+          <ProductDescription description={product.description} />
+        </div>
+      </div>
+    );
+  };
+
   return (
     <>
       <Header />
@@ -201,147 +347,12 @@ const ProductDetails = () => {
                       />
                     </div>
                   </div>
-                  <div className="xl:col-span-4">
-                    {/* details */}
-                    <div className="xl:ms-20 mt-4 xl:mt-0">
-                      <p className="text-3xl font-[600]">{product.name}</p>
-                      {/* attributes */}
-                      {product.attributes?.map((attr) =>
-                        attr.type == "text" ? (
-                          <div
-                            data-testid={`product-attribute-${formatToKebabCase(
-                              attr.name
-                            )}`}
-                            className="mt-8"
-                          >
-                            <p className="uppercase font-[800]">{attr.name}:</p>
-                            <div className="mt-2 flex">
-                              {attr.items.map((item) =>
-                                getAttribute(attr.name)?.value == item.value ? (
-                                  <div
-                                    data-testid={`product-attribute-${formatToKebabCase(
-                                      attr.name
-                                    )}-${formatToKebabCaseSensitive(
-                                      item.value
-                                    )}`}
-                                    key={item.value}
-                                    onClick={() =>
-                                      addAttribute(attr.name, item.value)
-                                    }
-                                    className="me-1 bg-primary w-16 h-10 flex justify-center items-center"
-                                  >
-                                    <p className="text-white uppercase text-sm">
-                                      {item.value}
-                                    </p>
-                                  </div>
-                                ) : (
-                                  <div
-                                    data-testid={`product-attribute-${formatToKebabCase(
-                                      attr.name
-                                    )}-${formatToKebabCaseSensitive(
-                                      item.value
-                                    )}`}
-                                    key={item.value}
-                                    onClick={() =>
-                                      addAttribute(attr.name, item.value)
-                                    }
-                                    className="border-2 me-1 border-primary w-16 h-10 flex justify-center items-center"
-                                  >
-                                    <p className="uppercase text-sm">
-                                      {item.value}
-                                    </p>
-                                  </div>
-                                )
-                              )}
-                            </div>
-                          </div>
-                        ) : (
-                          <div
-                            data-testid={`product-attribute-${formatToKebabCase(
-                              attr.name
-                            )}`}
-                            className="mt-8"
-                          >
-                            <p className="uppercase font-[800]">{attr.name}:</p>
-                            <div className="mt-2 flex">
-                              {attr.items.map((item) =>
-                                getAttribute(attr.name)?.value ==
-                                item.displayValue ? (
-                                  <div
-                                    data-testid={`product-attribute-${formatToKebabCase(
-                                      attr.name
-                                    )}-${formatToKebabCaseSensitive(
-                                      item.displayValue
-                                    )}`}
-                                    onClick={() =>
-                                      addAttribute(attr.name, item.displayValue)
-                                    }
-                                    className="p-4 me-2 outline outline-offset-2 outline-4 outline-secondary"
-                                    style={{ backgroundColor: item.value }}
-                                  ></div>
-                                ) : (
-                                  <div
-                                    data-testid={`product-attribute-${formatToKebabCase(
-                                      attr.name
-                                    )}-${formatToKebabCaseSensitive(
-                                      item.displayValue
-                                    )}`}
-                                    onClick={() =>
-                                      addAttribute(attr.name, item.displayValue)
-                                    }
-                                    className="p-4 me-2"
-                                    style={{ backgroundColor: item.value }}
-                                  ></div>
-                                )
-                              )}
-                            </div>
-                          </div>
-                        )
-                      )}
-
-                      {/* price */}
-
-                      <div className="py-6">
-                        <p className="uppercase font-[700]">price:</p>
-                        <p className="text-2xl font-[700] my-2">
-                          {product?.prices[0]?.currency?.symbol}
-                          {product?.prices[0]?.amount}
-                        </p>
-                      </div>
-
-                      {
-                        <button
-                          data-testid="add-to-cart"
-                          disabled={
-                            !(
-                              product.inStock &&
-                              product.attributes.length ===
-                                selectedAttributes.length
-                            )
-                          }
-                          onClick={() => {
-                            addToCart();
-                          }}
-                          className={`w-full py-4 text-center ${
-                            product.attributes.length ===
-                            selectedAttributes.length
-                              ? "bg-secondary"
-                              : "bg-green-300"
-                          } text-white`}
-                        >
-                          ADD TO CART
-                        </button>
-                      }
-
-                      {/* description */}
-                      <div
-                        data-testid="product-description"
-                        className="py-10 description"
-                      >
-                        {parse(product.description)}
-                      </div>
-                    </div>
-                  </div>
+                  <ProductDetails
+                    product={product}
+                    selectedAttributes={selectedAttributes}
+                    addAttribute={addAttribute}
+                    addToCart={addToCart}
+                  />
                 </div>
               </div>
             </div>
