@@ -117,7 +117,7 @@ class ProductResolver
         $sql = self::query();
 
         try {
-            $sql .= "WHERE p.id = :product_id GROUP BY p.id, c.name;";
+            $sql .= " WHERE p.id = :product_id GROUP BY p.id, c.name;";
             $id = trim($id);
             if ($id && !empty($id)) {
                 $stmt = $database->pdo->prepare($sql);
