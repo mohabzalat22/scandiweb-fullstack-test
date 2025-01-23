@@ -6,16 +6,20 @@ import { useQuery } from "@apollo/client";
 import { GET_PRODUCT_BY_ID } from "../graphql/query";
 import Header from "../layout/Header";
 import parse from "html-react-parser";
-import {useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import Overlay from "../components/Overlay";
-import {formatToKebabCase, formatToKebabCaseSensitive} from "../utils/kebab-case-helper";
+import {
+  formatToKebabCase,
+  formatToKebabCaseSensitive,
+} from "../utils/kebab-case-helper";
 
 const ProductDetails = () => {
   const { id } = useParams();
-  let [product, setProduct] = useState(null);
-  let [selectedAttributes, setSelectedAttributes] = useState([]);
+  const [product, setProduct] = useState(null);
+  const [selectedAttributes, setSelectedAttributes] = useState([]);
   const showCartMenu = useSelector((state) => state.menu.value);
-
+  const [gallery, setGallery] = useState([]);
+  const [selectedImage, setSelectedImage] = useState(null);
   const addAttribute = (name, value) => {
     let updatedAttributes;
 
@@ -29,35 +33,17 @@ const ProductDetails = () => {
 
     setSelectedAttributes(updatedAttributes);
   };
-
   const getAttribute = (key) =>
     selectedAttributes.find((attr) => attr.name === key);
-
-  let { loading, error, data } = useQuery(GET_PRODUCT_BY_ID, {
+  const { loading, error, data } = useQuery(GET_PRODUCT_BY_ID, {
     variables: { id: id },
   });
-
-  useEffect(() => {
-    if (data && data.product) {
-      setProduct(data.product);
-      setGallery(data.product.gallery);
-    }
-  }, [data]);
-
-  let [gallery, setGallery] = useState([]);
-  let [selectedImage, setSelectedImage] = useState(null);
-
-  useEffect(() => {
-    setSelectedImage(gallery[0]);
-  }, [gallery]);
-
   const getImageIndex = (src) => gallery.findIndex((el) => el === src);
-  let [cartItems, setCartItems] = useState(() => {
+  const [cartItems, setCartItems] = useState(() => {
     // Initialize cartItems with data from localStorage if available
     const savedCart = localStorage.getItem("cart");
     return savedCart ? JSON.parse(savedCart) : [];
   });
-
   const addToCart = () => {
     if (product.attributes.length === selectedAttributes.length) {
       // Check if the product is already in the cart
@@ -112,18 +98,29 @@ const ProductDetails = () => {
     };
   }, []);
 
-  // console.log(product);
+  useEffect(() => {
+    if (data && data.product) {
+      setProduct(data.product);
+      setGallery(data.product.gallery);
+    }
+  }, [data]);
+
+  useEffect(() => {
+    setSelectedImage(gallery[0]);
+  }, [gallery]);
+
   return (
     <>
-      <Header/>
+      <Header />
       {showCartMenu && <Overlay />}
       {product != null && (
         <div className="container mx-auto xl:px-24 mt-20">
           <div className="xl:grid xl:grid-cols-12">
             {/* GALLERY */}
             <div
-            data-testid='product-gallery'
-            className="flex xl:col-span-1 xl:flex-col my-2 xl:m-0 gap-4 max-h-[478px]  overflow-y-scroll scrollbar-hide">
+              data-testid="product-gallery"
+              className="flex xl:col-span-1 xl:flex-col my-2 xl:m-0 gap-4 max-h-[478px]  overflow-y-scroll scrollbar-hide"
+            >
               {product.gallery.map((src, i) => (
                 <div
                   key={i}
@@ -178,13 +175,22 @@ const ProductDetails = () => {
                       {/* attributes */}
                       {product.attributes?.map((attr) =>
                         attr.type == "text" ? (
-                          <div data-testid={`product-attribute-${formatToKebabCase(attr.name)}`} className="mt-8">
+                          <div
+                            data-testid={`product-attribute-${formatToKebabCase(
+                              attr.name
+                            )}`}
+                            className="mt-8"
+                          >
                             <p className="uppercase font-[800]">{attr.name}:</p>
                             <div className="mt-2 flex">
                               {attr.items.map((item) =>
                                 getAttribute(attr.name)?.value == item.value ? (
                                   <div
-                                    data-testid={`product-attribute-${formatToKebabCase(attr.name)}-${formatToKebabCaseSensitive(item.value)}`}
+                                    data-testid={`product-attribute-${formatToKebabCase(
+                                      attr.name
+                                    )}-${formatToKebabCaseSensitive(
+                                      item.value
+                                    )}`}
                                     key={item.value}
                                     onClick={() =>
                                       addAttribute(attr.name, item.value)
@@ -197,7 +203,11 @@ const ProductDetails = () => {
                                   </div>
                                 ) : (
                                   <div
-                                    data-testid={`product-attribute-${formatToKebabCase(attr.name)}-${formatToKebabCaseSensitive(item.value)}`}
+                                    data-testid={`product-attribute-${formatToKebabCase(
+                                      attr.name
+                                    )}-${formatToKebabCaseSensitive(
+                                      item.value
+                                    )}`}
                                     key={item.value}
                                     onClick={() =>
                                       addAttribute(attr.name, item.value)
@@ -213,14 +223,23 @@ const ProductDetails = () => {
                             </div>
                           </div>
                         ) : (
-                          <div data-testid={`product-attribute-${formatToKebabCase(attr.name)}`} className="mt-8">
+                          <div
+                            data-testid={`product-attribute-${formatToKebabCase(
+                              attr.name
+                            )}`}
+                            className="mt-8"
+                          >
                             <p className="uppercase font-[800]">{attr.name}:</p>
                             <div className="mt-2 flex">
                               {attr.items.map((item) =>
                                 getAttribute(attr.name)?.value ==
                                 item.displayValue ? (
                                   <div
-                                    data-testid={`product-attribute-${formatToKebabCase(attr.name)}-${formatToKebabCaseSensitive(item.displayValue)}`}
+                                    data-testid={`product-attribute-${formatToKebabCase(
+                                      attr.name
+                                    )}-${formatToKebabCaseSensitive(
+                                      item.displayValue
+                                    )}`}
                                     onClick={() =>
                                       addAttribute(attr.name, item.displayValue)
                                     }
@@ -229,7 +248,11 @@ const ProductDetails = () => {
                                   ></div>
                                 ) : (
                                   <div
-                                    data-testid={`product-attribute-${formatToKebabCase(attr.name)}-${formatToKebabCaseSensitive(item.displayValue)}`}
+                                    data-testid={`product-attribute-${formatToKebabCase(
+                                      attr.name
+                                    )}-${formatToKebabCaseSensitive(
+                                      item.displayValue
+                                    )}`}
                                     onClick={() =>
                                       addAttribute(attr.name, item.displayValue)
                                     }
@@ -253,29 +276,35 @@ const ProductDetails = () => {
                         </p>
                       </div>
 
-                     { 
-                      <button
-                      data-testid='add-to-cart'
-                      disabled={!(product.inStock && product.attributes.length ===
-                        selectedAttributes.length)}
-                      onClick={() => {
-                        addToCart();
-                      }}
-                      className={`w-full py-4 text-center ${
-                        product.attributes.length ===
-                        selectedAttributes.length
-                          ? "bg-secondary"
-                          : "bg-green-300"
-                      } text-white`}
-                    >
-                      ADD TO CART
-                    </button>
-                     }
+                      {
+                        <button
+                          data-testid="add-to-cart"
+                          disabled={
+                            !(
+                              product.inStock &&
+                              product.attributes.length ===
+                                selectedAttributes.length
+                            )
+                          }
+                          onClick={() => {
+                            addToCart();
+                          }}
+                          className={`w-full py-4 text-center ${
+                            product.attributes.length ===
+                            selectedAttributes.length
+                              ? "bg-secondary"
+                              : "bg-green-300"
+                          } text-white`}
+                        >
+                          ADD TO CART
+                        </button>
+                      }
 
                       {/* description */}
                       <div
-                      data-testid='product-description'
-                       className="py-10 description">
+                        data-testid="product-description"
+                        className="py-10 description"
+                      >
                         {parse(product.description)}
                       </div>
                     </div>
