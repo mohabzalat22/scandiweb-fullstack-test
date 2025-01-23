@@ -131,7 +131,225 @@ const Header = () => {
     }
   }, [cartItems]);
 
-  // mutation
+  const Total = () => {
+    return (
+      <div className="py-4 mt-8 flex justify-between">
+        <p className="capitalize font-[600]">Total</p>
+        <p data-testid="cart-total" className="font-[700] me-2">
+          {cartItems[0]?.prices[0]?.currency?.symbol}
+          {calculateTotal()}
+        </p>
+      </div>
+    );
+  };
+
+  const OrderButton = () => {
+    return (
+      <div className="mt-8">
+        <button
+          onClick={() => {
+            createNewOrder();
+          }}
+          className="bg-secondary text-center py-3 w-full font-[500] text-white"
+        >
+          PLACE ORDER
+        </button>
+      </div>
+    );
+  };
+
+  const CartItems = () => {
+    return (
+      <div>
+        {cartItems.map((el) => (
+          <div className="grid grid-cols-12 mb-8" key={generateUniqueId(el)}>
+            <div className="col-span-5 flex flex-col justify-between">
+              <div className="mb-1">
+                <p className="text-lg font-[300] text-primary">{el.name}</p>
+                <p className="text-base text-primary font-[600] my-1">
+                  {el.prices[0]?.currency.symbol}
+                  {parseFloat(el.prices[0]?.amount).toFixed(2)}
+                </p>
+              </div>
+              {/* attributes */}
+              {el.attributes.map((attr) =>
+                attr.type == "text" ? (
+                  <div
+                    className="mt-2"
+                    data-testid={`cart-item-attribute-${formatToKebabCase(
+                      el.name
+                    )}`}
+                  >
+                    <p className="text-sm capitalize">{attr.name}:</p>
+                    <div className="mt-1 flex flex-wrap">
+                      {attr.items?.map((item) =>
+                        el.selectedAttributes.some(
+                          (obj) =>
+                            obj.name === attr.name && obj.value === item.value // Check key and value
+                        ) ? (
+                          <div className="m-1 border-2 border-primary bg-primary flex justify-center items-center">
+                            <p className="text-xs text-white uppercase p-1">
+                              {item.value}
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="m-1 border-2 border-primary flex justify-center items-center">
+                            <p className="text-xs uppercase p-1">
+                              {item.value}
+                            </p>
+                          </div>
+                        )
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    className="mt-2"
+                    data-testid={`cart-item-attribute-${formatToKebabCase(
+                      el.name
+                    )}`}
+                  >
+                    <p className="text-sm capitalize">{attr.name}:</p>
+                    <div className="mt-1 flex flex-wrap">
+                      {attr.items?.map((item) =>
+                        el.selectedAttributes.some(
+                          (obj) =>
+                            obj.name === attr.name &&
+                            obj.value === item.displayValue // Check key and value
+                        ) ? (
+                          <div
+                            data-testid={`cart-item-attribute-${formatToKebabCase(
+                              el.name
+                            )}-selected`}
+                            className="p-3 m-1 outline outline-2 outline-offset-2 outline-secondary"
+                            style={{ backgroundColor: item.value }}
+                          ></div>
+                        ) : (
+                          <div
+                            data-testid={`cart-item-attribute-${formatToKebabCase(
+                              el.name
+                            )}`}
+                            className="p-3 m-1"
+                            style={{ backgroundColor: item.value }}
+                          ></div>
+                        )
+                      )}
+                    </div>
+                  </div>
+                )
+              )}
+            </div>
+            {/* counter */}
+            <div className="col-span-1 flex flex-col justify-between">
+              <button
+                data-testid="cart-item-amount-increase"
+                onClick={() => increaseQuantity(el)} // Pass the entire item object
+                className="w-8 h-8 border-2 border-primary flex justify-center items-center text-3xl g-0"
+              >
+                +
+              </button>
+              <p className="text-center font-bold">{el.quantity}</p>
+              <button
+                data-testid="cart-item-amount-decrease"
+                onClick={() => decreaseQuantity(el)} // Pass the entire item object
+                className="w-8 h-8 border-2 border-primary flex justify-center items-center text-3xl g-0"
+              >
+                -
+              </button>
+            </div>
+            {/* image */}
+            <div className="col-span-6 ps-4 h-full flex items-center">
+              <div className="xl:max-w-[122px] w-full">
+                <img
+                  src={el.gallery[0]}
+                  className="object-cover object-top w-full h-full"
+                />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  const CartButton = () => {
+    return (
+      <div className="col-span-1 flex justify-end me-4">
+        <div className="p-0.5 relative">
+          <button
+            data-testid="cart-btn"
+            className={`${
+              cartItems.length > 0 ? "" : "bg-gray-400 mix-blend-hard-light"
+            }`}
+            onClick={() => {
+              dispatch(setShowMenu(!showCartMenu));
+              if (cartItems.length > 0) {
+              }
+            }}
+          >
+            <CartIcon></CartIcon>
+          </button>
+          {cartItems.length > 0 && (
+            <div className="absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 bg-primary w-6 h-6 rounded-full flex justify-center items-start">
+              <p
+                data-testid="cart-item-amount"
+                className="text-white g-0 text-sm"
+              >
+                {cartItems.length}
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const Cartegories = () => {
+    return (
+      <div className="flex col-span-1 cursor-pointer">
+        {categories.map((el) =>
+          category == el ? (
+            <a
+              href={`/${el}`}
+              onClick={(e) => {
+                e.preventDefault();
+              }}
+              data-testid="active-category-link"
+              key={el}
+              className="pt-1 pb-8 px-4 border-b-2 border-b-secondary font-[600]"
+            >
+              <p className="uppercase text-base/[20px] text-secondary">{el}</p>
+            </a>
+          ) : (
+            <a
+              href={`/${el}`}
+              data-testid="category-link"
+              key={el}
+              className="pt-1 pb-8 px-4"
+              onClick={(e) => {
+                e.preventDefault();
+                dispatch(setCategory(el));
+              }}
+            >
+              <p className="uppercase text-base/[20px] text-primary">{el}</p>
+            </a>
+          )
+        )}
+      </div>
+    );
+  };
+
+  const Brand = () => {
+    return (
+      <div className="col-span-1 flex justify-center">
+        <div className="p-1">
+          <Link to="/">
+            <BrandIcon></BrandIcon>
+          </Link>
+        </div>
+      </div>
+    );
+  };
 
   if (loading) {
     return <Loading />;
@@ -146,76 +364,11 @@ const Header = () => {
       <header className="pt-6 relative z-50 bg-white">
         <div className="container mx-auto grid grid-cols-3 gap-1  xl:px-24">
           {/* categories */}
-          <div className="flex col-span-1 cursor-pointer">
-            {categories.map((el) =>
-              category == el ? (
-                <a
-                  href={`/${el}`}
-                  onClick={(e) => {
-                    e.preventDefault();
-                  }}
-                  data-testid="active-category-link"
-                  key={el}
-                  className="pt-1 pb-8 px-4 border-b-2 border-b-secondary font-[600]"
-                >
-                  <p className="uppercase text-base/[20px] text-secondary">
-                    {el}
-                  </p>
-                </a>
-              ) : (
-                <a
-                  href={`/${el}`}
-                  data-testid="category-link"
-                  key={el}
-                  className="pt-1 pb-8 px-4"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    dispatch(setCategory(el));
-                  }}
-                >
-                  <p className="uppercase text-base/[20px] text-primary">
-                    {el}
-                  </p>
-                </a>
-              )
-            )}
-          </div>
-          <div className="col-span-1 flex justify-center">
-            <div className="p-1">
-              <Link to="/">
-                <BrandIcon></BrandIcon>
-              </Link>
-            </div>
-          </div>
-
+          <Cartegories />
+          {/* brand */}
+          <Brand />
           {/* cart button */}
-          <div className="col-span-1 flex justify-end me-4">
-            <div className="p-0.5 relative">
-              <button
-                data-testid="cart-btn"
-                className={`${
-                  cartItems.length > 0 ? "" : "bg-gray-400 mix-blend-hard-light"
-                }`}
-                onClick={() => {
-                  dispatch(setShowMenu(!showCartMenu));
-                  if (cartItems.length > 0) {
-                  }
-                }}
-              >
-                <CartIcon></CartIcon>
-              </button>
-              {cartItems.length > 0 && (
-                <div className="absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 bg-primary w-6 h-6 rounded-full flex justify-center items-start">
-                  <p
-                    data-testid="cart-item-amount"
-                    className="text-white g-0 text-sm"
-                  >
-                    {cartItems.length}
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
+          <CartButton />
         </div>
 
         {/* Cart menu */}
@@ -241,146 +394,13 @@ const Header = () => {
                     )}
                   </div>
                   {/* Cart items */}
-                  <div>
-                    {cartItems.map((el) => (
-                      <div
-                        className="grid grid-cols-12 mb-8"
-                        key={generateUniqueId(el)}
-                      >
-                        <div className="col-span-5 flex flex-col justify-between">
-                          <div className="mb-1">
-                            <p className="text-lg font-[300] text-primary">
-                              {el.name}
-                            </p>
-                            <p className="text-base text-primary font-[600] my-1">
-                              {el.prices[0]?.currency.symbol}
-                              {parseFloat(el.prices[0]?.amount).toFixed(2)}
-                            </p>
-                          </div>
-                          {/* attributes */}
-                          {el.attributes.map((attr) =>
-                            attr.type == "text" ? (
-                              <div
-                                className="mt-2"
-                                data-testid={`cart-item-attribute-${formatToKebabCase(
-                                  el.name
-                                )}`}
-                              >
-                                <p className="text-sm capitalize">
-                                  {attr.name}:
-                                </p>
-                                <div className="mt-1 flex flex-wrap">
-                                  {attr.items?.map((item) =>
-                                    el.selectedAttributes.some(
-                                      (obj) =>
-                                        obj.name === attr.name &&
-                                        obj.value === item.value // Check key and value
-                                    ) ? (
-                                      <div className="m-1 border-2 border-primary bg-primary flex justify-center items-center">
-                                        <p className="text-xs text-white uppercase p-1">
-                                          {item.value}
-                                        </p>
-                                      </div>
-                                    ) : (
-                                      <div className="m-1 border-2 border-primary flex justify-center items-center">
-                                        <p className="text-xs uppercase p-1">
-                                          {item.value}
-                                        </p>
-                                      </div>
-                                    )
-                                  )}
-                                </div>
-                              </div>
-                            ) : (
-                              <div
-                                className="mt-2"
-                                data-testid={`cart-item-attribute-${formatToKebabCase(
-                                  el.name
-                                )}`}
-                              >
-                                <p className="text-sm capitalize">
-                                  {attr.name}:
-                                </p>
-                                <div className="mt-1 flex flex-wrap">
-                                  {attr.items?.map((item) =>
-                                    el.selectedAttributes.some(
-                                      (obj) =>
-                                        obj.name === attr.name &&
-                                        obj.value === item.displayValue // Check key and value
-                                    ) ? (
-                                      <div
-                                        data-testid={`cart-item-attribute-${formatToKebabCase(
-                                          el.name
-                                        )}-selected`}
-                                        className="p-3 m-1 outline outline-2 outline-offset-2 outline-secondary"
-                                        style={{ backgroundColor: item.value }}
-                                      ></div>
-                                    ) : (
-                                      <div
-                                        data-testid={`cart-item-attribute-${formatToKebabCase(
-                                          el.name
-                                        )}`}
-                                        className="p-3 m-1"
-                                        style={{ backgroundColor: item.value }}
-                                      ></div>
-                                    )
-                                  )}
-                                </div>
-                              </div>
-                            )
-                          )}
-                        </div>
-                        {/* counter */}
-                        <div className="col-span-1 flex flex-col justify-between">
-                          <button
-                            data-testid="cart-item-amount-increase"
-                            onClick={() => increaseQuantity(el)} // Pass the entire item object
-                            className="w-8 h-8 border-2 border-primary flex justify-center items-center text-3xl g-0"
-                          >
-                            +
-                          </button>
-                          <p className="text-center font-bold">{el.quantity}</p>
-                          <button
-                            data-testid="cart-item-amount-decrease"
-                            onClick={() => decreaseQuantity(el)} // Pass the entire item object
-                            className="w-8 h-8 border-2 border-primary flex justify-center items-center text-3xl g-0"
-                          >
-                            -
-                          </button>
-                        </div>
-                        {/* image */}
-                        <div className="col-span-6 ps-4 h-full flex items-center">
-                          <div className="xl:max-w-[122px] w-full">
-                            <img
-                              src={el.gallery[0]}
-                              className="object-cover object-top w-full h-full"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                  <CartItems />
                 </>
               )}
               {/* total */}
-              <div className="py-4 mt-8 flex justify-between">
-                <p className="capitalize font-[600]">Total</p>
-                <p data-testid="cart-total" className="font-[700] me-2">
-                  {cartItems[0]?.prices[0]?.currency?.symbol}
-                  {calculateTotal()}
-                </p>
-              </div>
+              <Total />
               {/* order button */}
-              <div className="mt-8">
-                <button
-                  onClick={() => {
-                    createNewOrder();
-                  }}
-                  className="bg-secondary text-center py-3 w-full font-[500] text-white"
-                >
-                  PLACE ORDER
-                </button>
-              </div>
+              <OrderButton />
             </div>
           </div>
         )}
