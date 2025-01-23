@@ -21,7 +21,7 @@ abstract class Model
 
     public function find($id)
     {
-        return $this->orm->get($this->table,"*", ['id'=> $id]);
+        return $this->orm->get($this->table, "*", ['id' => $id]);
     }
 
     public function all()
@@ -31,17 +31,17 @@ abstract class Model
 
     public function update($id, array $data)
     {
-        if(isset($data['id'])){
+        if (isset($data['id'])) {
             unset($data['id']); // unset id 
         }
 
-        $result = $this->orm->update($this->table, $data, ['id'=> $id]);
-        return $result->rowCount() ?  $this->find($id) : NULL; 
+        $result = $this->orm->update($this->table, $data, ['id' => $id]);
+        return $result->rowCount() ?  $this->find($id) : NULL;
     }
 
     public function delete($id)
     {
-        $result = $this->orm->delete($this->table, ['id'=> $id]);
-        return $result->rowCount() ?  TRUE : FALSE; 
+        $result = $this->orm->delete($this->table, ['id' => $id]);
+        return $result->rowCount() ?  TRUE : FALSE;
     }
 }

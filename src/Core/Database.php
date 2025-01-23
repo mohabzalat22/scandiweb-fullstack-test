@@ -1,4 +1,5 @@
 <?php
+
 namespace App;
 
 use Medoo\Medoo;
@@ -11,7 +12,7 @@ class Database
     private function __construct()
     {
         $databaseConfig = require BASE_PATH . '/config/database.php';
-    
+
         $config = [
             'type'   => $databaseConfig['db_driver'],
             'host'     => $databaseConfig['db_host'],
@@ -39,5 +40,4 @@ class Database
     {
         return $this->database;
     }
-
 }

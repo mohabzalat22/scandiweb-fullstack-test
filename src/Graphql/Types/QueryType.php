@@ -4,11 +4,11 @@ namespace App\Graphql\Types;
 
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
-use Exception;
 use App\Graphql\Resolvers\ProductResolver;
 use App\Models\Category;
 
-final class QueryType extends ObjectType {
+final class QueryType extends ObjectType
+{
 
     public function __construct()
     {
@@ -21,24 +21,24 @@ final class QueryType extends ObjectType {
                     'args' => [
                         'message' => ['type' => Type::string()],
                     ],
-                    'resolve' => static fn ($rootValue, array $args): string => $rootValue['prefix'] . $args['message'],
+                    'resolve' => static fn($rootValue, array $args): string => $rootValue['prefix'] . $args['message'],
                 ],
                 'categories' => [
                     'type' => Type::listOf(new CategoryType()),
-                    'resolve' => function(){
+                    'resolve' => function () {
                         return (new Category())->all();
                     }
                 ],
                 'products' => [
                     'type' => Type::listOf($productType),
                     'args' => [
-                        'category' =>[
+                        'category' => [
                             'type' => Type::string()
-                            ]
-                        ],
-                    'resolve' => function($root, $args){
+                        ]
+                    ],
+                    'resolve' => function ($root, $args) {
                         return ProductResolver::all($args['category']);
-                    },  
+                    },
                 ],
                 'product' => [
                     'type' => $productType,
@@ -47,7 +47,7 @@ final class QueryType extends ObjectType {
                             'type' => Type::nonNull(Type::string())
                         ]
                     ],
-                    'resolve' => function($root, $args){
+                    'resolve' => function ($root, $args) {
                         $product = ProductResolver::find($args['id']);
                         return $product;
                     }

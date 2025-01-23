@@ -5,7 +5,7 @@ namespace App\Graphql\Types;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\Type;
 
-final class OrderItemType extends InputObjectType 
+final class OrderItemType extends InputObjectType
 {
     public function __construct()
     {

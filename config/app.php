@@ -7,6 +7,6 @@ return [
     'debug' => $_ENV['APP_DEBUG'] ?? false,
     'timezone' => $_ENV['APP_TIMEZONE'] ?? 'UTC',
     'locale' => $_ENV['APP_LOCALE'] ?? 'en',
-    'url' => $_ENV['APP_URL'] ?? 'http://localhost', 
+    'url' => $_ENV['APP_URL'] ?? 'http://localhost',
     // 'log_level' => 'error', 
 ];

@@ -7,7 +7,6 @@ use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 
 use App\Graphql\Types\OrderType;
-use App\Graphql\Types\OrderItemType;
 
 final class MutationType extends ObjectType
 {

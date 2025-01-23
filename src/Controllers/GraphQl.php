@@ -15,7 +15,8 @@ use App\App;
 
 class GraphQL extends Controller
 {
-    public static function handle() {
+    public static function handle()
+    {
         header('Content-Type: application/json; charset=UTF-8');
 
         if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
@@ -27,21 +28,21 @@ class GraphQL extends Controller
             $logger = App::init()->getService('logger');
 
             $queryType = new QueryType();
-        
+
             $mutationType = new MutationType();
-        
+
             $schema = new Schema(
                 (new SchemaConfig())
                     ->setQuery($queryType)
                     ->setMutation($mutationType)
             );
-        
+
             $rawInput = file_get_contents('php://input');
 
             if ($rawInput === false) {
                 throw new RuntimeException('Failed to get php://input');
             }
-        
+
             $input = json_decode($rawInput, true);
             if (!is_array($input)) {
                 throw new RuntimeException('Invalid JSON input.');
@@ -52,7 +53,7 @@ class GraphQL extends Controller
             }
 
             $variableValues = $input['variables'] ?? null;
-        
+
             $query = $input['query'] ?? null;
 
             if (!$query) {
@@ -66,7 +67,7 @@ class GraphQL extends Controller
             $logger->error('An error occurred: ' . $e->getMessage(), [
                 'exception' => $e,
                 'stack_trace' => $e->getTraceAsString(),
-            ]);            
+            ]);
             $output = [
                 'error' => [
                     'message' => $e->getMessage(),

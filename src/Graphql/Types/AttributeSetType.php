@@ -1,10 +1,12 @@
 <?php
+
 namespace App\Graphql\Types;
 
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 
-final class AttributeSetType extends ObjectType {
+final class AttributeSetType extends ObjectType
+{
 
     public function __construct()
     {

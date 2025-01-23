@@ -1,10 +1,11 @@
 <?php
+
 namespace App\Graphql\Types;
 
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\Type;
 
-final class OrderType extends InputObjectType 
+final class OrderType extends InputObjectType
 {
     public function __construct()
     {

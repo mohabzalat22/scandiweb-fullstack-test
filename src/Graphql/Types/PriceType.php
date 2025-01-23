@@ -5,7 +5,8 @@ namespace App\Graphql\Types;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 
-final class PriceType extends ObjectType {
+final class PriceType extends ObjectType
+{
 
     public function __construct()
     {
