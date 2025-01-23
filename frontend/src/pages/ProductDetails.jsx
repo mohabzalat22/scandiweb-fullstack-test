@@ -109,6 +109,27 @@ const ProductDetails = () => {
     setSelectedImage(gallery[0]);
   }, [gallery]);
 
+  // components
+
+  const GalleryItem = ({ src, onClick }) => (
+    <div className="w-20 h-20 aspect-square" onClick={onClick}>
+      <img src={src} className="object-cover w-full h-full" alt="Gallery item" />
+    </div>
+  );
+  
+  // Gallery Component
+  const Gallery = ({ gallery, onSelectImage }) => (
+    <div
+      data-testid="product-gallery"
+      className="flex xl:col-span-1 xl:flex-col my-2 xl:m-0 gap-4 max-h-[478px] overflow-y-scroll scrollbar-hide"
+    >
+      {gallery.map((src, i) => (
+        <GalleryItem key={i} src={src} onClick={() => onSelectImage(src)} />
+      ))}
+    </div>
+  );
+
+
   return (
     <>
       <Header />
@@ -117,20 +138,7 @@ const ProductDetails = () => {
         <div className="container mx-auto xl:px-24 mt-20">
           <div className="xl:grid xl:grid-cols-12">
             {/* GALLERY */}
-            <div
-              data-testid="product-gallery"
-              className="flex xl:col-span-1 xl:flex-col my-2 xl:m-0 gap-4 max-h-[478px]  overflow-y-scroll scrollbar-hide"
-            >
-              {product.gallery.map((src, i) => (
-                <div
-                  key={i}
-                  className="w-20 h-20 aspect-square"
-                  onClick={() => setSelectedImage(src)}
-                >
-                  <img src={src} className="object-cover w-full h-full" />
-                </div>
-              ))}
-            </div>
+            <Gallery gallery={product.gallery} onSelectImage={setSelectedImage} />
             {/* main image */}
             <div className="xl:col-span-11">
               <div className="flex w-full">
