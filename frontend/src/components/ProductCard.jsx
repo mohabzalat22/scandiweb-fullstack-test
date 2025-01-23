@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import QuickShopIcon from "../assets/icons/QuickShopIcon";
 import { Link, useNavigate } from "react-router-dom";
-import formatToKebabCase from '../utils/kebab-case-helper';
+import {formatToKebabCase} from '../utils/kebab-case-helper';
 
 const ProductCard = ({ product }) => {
   const navigate = useNavigate();
