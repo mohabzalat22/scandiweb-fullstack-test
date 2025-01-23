@@ -8,7 +8,7 @@ import Header from "../layout/Header";
 import parse from "html-react-parser";
 import {useSelector } from "react-redux";
 import Overlay from "../components/Overlay";
-import formatToKebabCase from "../utils/kebab-case-helper";
+import {formatToKebabCase, formatToKebabCaseSensitive} from "../utils/kebab-case-helper";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -184,6 +184,7 @@ const ProductDetails = () => {
                               {attr.items.map((item) =>
                                 getAttribute(attr.name)?.value == item.value ? (
                                   <div
+                                    data-testid={`product-attribute-${formatToKebabCase(attr.name)}-${formatToKebabCaseSensitive(item.value)}`}
                                     key={item.value}
                                     onClick={() =>
                                       addAttribute(attr.name, item.value)
@@ -196,6 +197,7 @@ const ProductDetails = () => {
                                   </div>
                                 ) : (
                                   <div
+                                    data-testid={`product-attribute-${formatToKebabCase(attr.name)}-${formatToKebabCaseSensitive(item.value)}`}
                                     key={item.value}
                                     onClick={() =>
                                       addAttribute(attr.name, item.value)
@@ -211,13 +213,14 @@ const ProductDetails = () => {
                             </div>
                           </div>
                         ) : (
-                          <div className="mt-8">
+                          <div data-testid={`product-attribute-${formatToKebabCase(attr.name)}`} className="mt-8">
                             <p className="uppercase font-[800]">{attr.name}:</p>
                             <div className="mt-2 flex">
                               {attr.items.map((item) =>
                                 getAttribute(attr.name)?.value ==
                                 item.displayValue ? (
                                   <div
+                                    data-testid={`product-attribute-${formatToKebabCase(attr.name)}-${formatToKebabCaseSensitive(item.displayValue)}`}
                                     onClick={() =>
                                       addAttribute(attr.name, item.displayValue)
                                     }
@@ -226,6 +229,7 @@ const ProductDetails = () => {
                                   ></div>
                                 ) : (
                                   <div
+                                    data-testid={`product-attribute-${formatToKebabCase(attr.name)}-${formatToKebabCaseSensitive(item.displayValue)}`}
                                     onClick={() =>
                                       addAttribute(attr.name, item.displayValue)
                                     }
@@ -249,10 +253,11 @@ const ProductDetails = () => {
                         </p>
                       </div>
 
-                     {
-                      product?.inStock &&  
+                     { 
                       <button
                       data-testid='add-to-cart'
+                      disabled={!(product.inStock && product.attributes.length ===
+                        selectedAttributes.length)}
                       onClick={() => {
                         addToCart();
                       }}
@@ -260,7 +265,7 @@ const ProductDetails = () => {
                         product.attributes.length ===
                         selectedAttributes.length
                           ? "bg-secondary"
-                          : "bg-green-300 disabled"
+                          : "bg-green-300"
                       } text-white`}
                     >
                       ADD TO CART
