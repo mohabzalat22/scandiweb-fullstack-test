@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setCategory } from "../rtk/slices/categorySlice";
 import { setShowMenu } from "../rtk/slices/menuSlice";
 import { Link, useNavigate } from "react-router-dom";
-import formatToKebabCase from "../utils/kebab-case-helper";
+import {formatToKebabCase} from "../utils/kebab-case-helper";
 import Loading from "../pages/Loading";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -197,17 +197,17 @@ const Header = () => {
 
           {/* cart button */}
           <div
-            data-testid="cart-btn"
             className="col-span-1 flex justify-end me-4"
           >
             <div className="p-0.5 relative">
               <button
+              data-testid="cart-btn"
                 className={`${
                   cartItems.length > 0 ? "" : "bg-gray-400 mix-blend-hard-light"
                 }`}
                 onClick={() => {
+                  dispatch(setShowMenu(!showCartMenu));
                   if (cartItems.length > 0) {
-                    dispatch(setShowMenu(!showCartMenu));
                   }
                 }}
               >
@@ -230,7 +230,7 @@ const Header = () => {
         {/* Cart menu */}
         {showCartMenu && (
           <div className="container mx-auto xl:px-24 relative z-50">
-            <div className="w-[350px] px-4 py-6 absolute xl:end-24 end-0 bg-white">
+            <div data-testid="cart-overlay" className="w-[350px] px-4 py-6 absolute xl:end-24 end-0 bg-white">
               {cartItems.length > 0 && (
                 <>
                   <div className="mb-8">
