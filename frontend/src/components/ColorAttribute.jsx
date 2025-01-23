@@ -1,4 +1,8 @@
 import React from "react";
+import {
+  formatToKebabCase,
+  formatToKebabCaseSensitive,
+} from "../utils/kebab-case-helper";
 
 const ColorAttribute = ({ attr, selectedValue, onSelect }) => (
   <div
