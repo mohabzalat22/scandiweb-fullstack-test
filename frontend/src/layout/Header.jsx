@@ -8,50 +8,19 @@ import { useDispatch, useSelector } from "react-redux";
 import { setCategory } from "../rtk/slices/categorySlice";
 import { setShowMenu } from "../rtk/slices/menuSlice";
 import { Link, useNavigate } from "react-router-dom";
-import {formatToKebabCase} from "../utils/kebab-case-helper";
+import { formatToKebabCase } from "../utils/kebab-case-helper";
 import Loading from "../pages/Loading";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const Header = () => {
   const navigate = useNavigate();
-
   const { loading, error, data } = useQuery(GET_CATEGORIES);
   const dispatch = useDispatch();
-  let categories = ["all"];
-  if (data) {
-    categories = [...categories, ...data.categories.map((el) => el.name)];
-  }
-
-  let category = useSelector((state) => state.category.value);
-  let showCartMenu = useSelector((state) => state.menu.value);
-
-  // Initialize cartItems from localStorage
-  let [cartItems, setCartItems] = useState(() => {
-    let localStorageCart = localStorage.getItem("cart");
-    return localStorageCart ? JSON.parse(localStorageCart) : [];
-  });
-
-  // Function to update cartItems from localStorage
   const updateCartItems = () => {
     let localStorageCart = localStorage.getItem("cart");
     setCartItems(localStorageCart ? JSON.parse(localStorageCart) : []);
   };
-
-  useEffect(() => {
-    const handleCartChange = () => {
-      dispatch(setShowMenu(true));
-      updateCartItems(); // Update cartItems when the custom event is triggered
-    };
-
-    // Add a custom event listener for cart changes in the same tab
-    window.addEventListener("cartUpdated", handleCartChange);
-
-    return () => {
-      window.removeEventListener("cartUpdated", handleCartChange);
-    };
-  }, []);
-
   const generateUniqueId = (item) => {
     // Extract the selected attribute values
     const selectedValues = Object.values(item.selectedAttributes).map(
@@ -64,7 +33,6 @@ const Header = () => {
     // Combine the item ID and selected attribute values
     return `${item.id}-${selectedValues.join("-")}`;
   };
-
   // Function to increase the quantity of an item in the cart
   const increaseQuantity = (item) => {
     const uniqueId = generateUniqueId(item);
@@ -102,14 +70,6 @@ const Header = () => {
       )
       .toFixed(2);
   };
-
-  useEffect(() => {
-    if (cartItems.length == 0) {
-      dispatch(setShowMenu(false));
-    }
-  }, [cartItems]);
-
-  // mutation
   const [createOrder] = useMutation(CREATE_NEW_ORDER);
   const createNewOrder = async () => {
     if (cartItems.length > 0) {
@@ -139,6 +99,39 @@ const Header = () => {
       }
     }
   };
+  let categories = ["all"];
+  let category = useSelector((state) => state.category.value);
+  let showCartMenu = useSelector((state) => state.menu.value);
+  let [cartItems, setCartItems] = useState(() => {
+    let localStorageCart = localStorage.getItem("cart");
+    return localStorageCart ? JSON.parse(localStorageCart) : [];
+  });
+
+  if (data) {
+    categories = [...categories, ...data.categories.map((el) => el.name)];
+  }
+
+  useEffect(() => {
+    const handleCartChange = () => {
+      dispatch(setShowMenu(true));
+      updateCartItems(); // Update cartItems when the custom event is triggered
+    };
+
+    // Add a custom event listener for cart changes in the same tab
+    window.addEventListener("cartUpdated", handleCartChange);
+
+    return () => {
+      window.removeEventListener("cartUpdated", handleCartChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (cartItems.length == 0) {
+      dispatch(setShowMenu(false));
+    }
+  }, [cartItems]);
+
+  // mutation
 
   if (loading) {
     return <Loading />;
@@ -196,12 +189,10 @@ const Header = () => {
           </div>
 
           {/* cart button */}
-          <div
-            className="col-span-1 flex justify-end me-4"
-          >
+          <div className="col-span-1 flex justify-end me-4">
             <div className="p-0.5 relative">
               <button
-              data-testid="cart-btn"
+                data-testid="cart-btn"
                 className={`${
                   cartItems.length > 0 ? "" : "bg-gray-400 mix-blend-hard-light"
                 }`}
@@ -230,7 +221,10 @@ const Header = () => {
         {/* Cart menu */}
         {showCartMenu && (
           <div className="container mx-auto xl:px-24 relative z-50">
-            <div data-testid="cart-overlay" className="w-[350px] px-4 py-6 absolute xl:end-24 end-0 bg-white">
+            <div
+              data-testid="cart-overlay"
+              className="w-[350px] px-4 py-6 absolute xl:end-24 end-0 bg-white"
+            >
               {cartItems.length > 0 && (
                 <>
                   <div className="mb-8">
