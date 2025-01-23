@@ -74,6 +74,19 @@ const ProductDetails = () => {
       window.dispatchEvent(new Event("cartUpdated"));
     }
   };
+  const handlePrev = () => {
+    const prevIndex = getImageIndex(selectedImage) - 1;
+    if (prevIndex >= 0) {
+      setSelectedImage(product.gallery[prevIndex]);
+    }
+  };
+
+  const handleNext = () => {
+    const nextIndex = getImageIndex(selectedImage) + 1;
+    if (nextIndex < product.gallery.length) {
+      setSelectedImage(product.gallery[nextIndex]);
+    }
+  };
 
   useEffect(() => {
     const handleProductQuantityUpdated = (event) => {
@@ -113,10 +126,14 @@ const ProductDetails = () => {
 
   const GalleryItem = ({ src, onClick }) => (
     <div className="w-20 h-20 aspect-square" onClick={onClick}>
-      <img src={src} className="object-cover w-full h-full" alt="Gallery item" />
+      <img
+        src={src}
+        className="object-cover w-full h-full"
+        alt="Gallery item"
+      />
     </div>
   );
-  
+
   // Gallery Component
   const Gallery = ({ gallery, onSelectImage }) => (
     <div
@@ -129,6 +146,33 @@ const ProductDetails = () => {
     </div>
   );
 
+  // Main Image Nav Component
+  const NavigationButton = ({ onClick, children }) => (
+    <button onClick={onClick} className="focus:outline-none">
+      {children}
+    </button>
+  );
+
+  // MainImage Component
+  const MainImage = ({ selectedImage, gallery, onPrev, onNext }) => (
+    <div className="w-[575px] h-[478px] overflow-hidden relative">
+      <img
+        src={selectedImage}
+        className="object-contain object-center w-full h-full absolute"
+        alt="Selected product"
+      />
+      <div className="absolute z-30 top-1/2 -translate-y-1/2 w-full">
+        <div className="flex justify-between w-full px-4">
+          <NavigationButton onClick={onPrev}>
+            <PrevIcon />
+          </NavigationButton>
+          <NavigationButton onClick={onNext}>
+            <NextIcon />
+          </NavigationButton>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <>
@@ -138,42 +182,23 @@ const ProductDetails = () => {
         <div className="container mx-auto xl:px-24 mt-20">
           <div className="xl:grid xl:grid-cols-12">
             {/* GALLERY */}
-            <Gallery gallery={product.gallery} onSelectImage={setSelectedImage} />
-            {/* main image */}
+            <Gallery
+              gallery={product.gallery}
+              onSelectImage={setSelectedImage}
+            />
+            {/* MAIN PRODUCT */}
             <div className="xl:col-span-11">
               <div className="flex w-full">
                 <div className="xl:grid xl:grid-cols-12">
                   <div className="xl:col-span-6">
-                    <div className="w-[575px] h-[478px] overflow-hidden relative">
-                      <img
-                        src={selectedImage}
-                        className="object-contain object-center w-full h-full absolute"
+                    {/* MAIN IMAGE */}
+                    <div>
+                      <MainImage
+                        selectedImage={selectedImage}
+                        gallery={product.gallery}
+                        onPrev={handlePrev}
+                        onNext={handleNext}
                       />
-                      <div className="absolute z-30 top-1/2 -translate-y-1/2 w-full">
-                        <div className="flex justify-between w-full px-4">
-                          <button
-                            onClick={() =>
-                              getImageIndex(selectedImage) - 1 >= 0 &&
-                              setSelectedImage(
-                                gallery[getImageIndex(selectedImage) - 1]
-                              )
-                            }
-                          >
-                            <PrevIcon></PrevIcon>
-                          </button>
-                          <button
-                            onClick={() =>
-                              getImageIndex(selectedImage) + 1 <
-                                gallery.length &&
-                              setSelectedImage(
-                                gallery[getImageIndex(selectedImage) + 1]
-                              )
-                            }
-                          >
-                            <NextIcon></NextIcon>
-                          </button>
-                        </div>
-                      </div>
                     </div>
                   </div>
                   <div className="xl:col-span-4">
